@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="es.jafs.jaiberdroid"
+	android:versionCode="1"
+	android:versionName="0.5 alpha" >
+
+	<uses-sdk
+		android:minSdkVersion="8"
+		android:targetSdkVersion="17" />
+
+	<application android:label="Jaiberdroid">
+	</application>
+</manifest>
