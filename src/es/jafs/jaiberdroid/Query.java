@@ -82,7 +82,6 @@ public final class Query {
 
 	/**
 	 * Creates an insert query.
-	 * @param  entity  Entity class to execute.
 	 * @param  object  Object with data to insert.
 	 * @return Query   Query generated.
 	 * @throws JaiberdroidException 
