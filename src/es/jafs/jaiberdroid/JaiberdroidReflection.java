@@ -110,7 +110,7 @@ public class JaiberdroidReflection {
 
 	/**
 	 * Loads the columns of database in the object.
-	 * @param  entity  Entity to analize.
+	 * @param  type  Class of entity to analize.
 	 */
 	@SuppressWarnings("rawtypes")
 	private static Entity loadTable(final Class type) {

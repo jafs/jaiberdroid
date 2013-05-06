@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Entity loader for the Jaiberdroid system.
  * @author  Jose Antonio Fuentes Santiago
- * @versino 0.5
+ * @version 0.5
  */
 final class EntityManager {
 	/** Map of entities. */

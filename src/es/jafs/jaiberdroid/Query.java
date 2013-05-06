@@ -99,7 +99,6 @@ public final class Query {
 
 	/**
 	 * Creates an update query.
-	 * @param  entity  Entity class to execute.
 	 * @param  object  Object with data to update.
 	 * @return Query   Query generated.
 	 * @throws JaiberdroidException 
@@ -118,9 +117,9 @@ public final class Query {
 
 	/**
 	 * Creates a delete query.
-	 * @param  object  Object with data to delete.
-	 * @param  id      Id of elemento to delete. If id is -1, get the remove all query.
-	 * @return Query   Query generated.
+	 * @param  type  Type of entity.
+	 * @param  id    Id of elemento to delete. If id is -1, get the remove all query.
+	 * @return Query generated.
 	 * @throws JaiberdroidException 
 	 */
 	@SuppressWarnings("rawtypes")

@@ -130,9 +130,7 @@ final class QueryManager extends SQLiteOpenHelper {
 	/**
 	 * Execute a query in database.
 	 * @param  query        String with query to execute.
-	 * @param  transaction  Boolean value that sets if the queries are executed in transacction.
 	 * @param  database     Database into execute queries.
-	 * @return Boolean value that indicates if all it's ok.
 	 */
 	public void executeUpdate(final String query, final SQLiteDatabase database) throws SQLException {
 		database.execSQL(query);
@@ -218,7 +216,7 @@ final class QueryManager extends SQLiteOpenHelper {
 
 	/**
 	 * Executes a query that returns data of an entity.
-	 * @param  query  Query to execute.
+	 * @param  entity  Entity with table to count.
 	 * @return List of results or null is there an error.
 	 * @throws JaiberdroidException 
 	 */

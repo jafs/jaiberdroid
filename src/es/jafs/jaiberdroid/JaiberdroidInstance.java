@@ -78,10 +78,10 @@ public final class JaiberdroidInstance {
 
 	/**
 	 * Gets the instance of Jaiberdroid.
-	 * @return
+	 * @return The current Jaiberdroid instance.
 	 * @throws Exception 
 	 */
-	public static JaiberdroidInstance getInstance() throws IllegalAccessException {
+	static JaiberdroidInstance getInstance() throws IllegalAccessException {
 		if (!created) {
 			throw new IllegalAccessException("You must to initialize the instance");
 		} else if (null == instance) {
@@ -144,7 +144,6 @@ public final class JaiberdroidInstance {
 
 	/**
 	 * Load the system entities to be used.
-	 * @param  resource  Id of resource for load entities.
 	 * @throws JaiberdroidException 
 	 */
 	private void loadEntities() throws JaiberdroidException {
@@ -165,7 +164,6 @@ public final class JaiberdroidInstance {
 
 	/**
 	 * Loads the database's version.
-	 * @return Boolean value that it's true when all it's ok.
 	 * @throws JaiberdroidException 
 	 */
 	private void loadVersion() throws JaiberdroidException {
@@ -185,7 +183,6 @@ public final class JaiberdroidInstance {
 
 	/**
 	 * Loads the database's name.
-	 * @return Boolean value that it's true when all it's ok.
 	 * @throws JaiberdroidException 
 	 */
 	private void loadName() throws JaiberdroidException {

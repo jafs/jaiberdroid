@@ -65,7 +65,6 @@ class Field {
 	 * @param  name     Name of the field.
 	 * @param  type     Field's data type.
 	 * @param  isnull   Field is null or not.
-	 * @param  auto     The field is auto numeric.
 	 * @param  unique   The field has unique constraint.
 	 * @param  fieldClass  Class type of the field
 	 */
