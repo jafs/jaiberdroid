@@ -90,22 +90,22 @@ public class GenericQuery<T> {
 	/**
 	 * Update the received object.
 	 * @param  object  Object to update.
-	 * @return Number of rows affected.
+	 * @return Boolean value that is true if entity has been updated.
 	 * @throws JaiberdroidException 
 	 */
-	public long update(final T object) throws JaiberdroidException {
-		return queryManager.executeUpdate(Query.createUpdate(object));
+	public boolean update(final T object) throws JaiberdroidException {
+		return (1L == queryManager.executeUpdate(Query.createUpdate(object)));
 	}
 
 
 	/**
 	 * Delete an object with its id.
 	 * @param  id  Id of the object to delete.
-	 * @return Number of rows affected.
+	 * @return Boolean value that is true if the row has been deleted.
 	 * @throws JaiberdroidException 
 	 */
-	public long remove(final int id) throws JaiberdroidException {
-		return queryManager.executeUpdate(Query.createDelete(entity.getReferenced(), id));
+	public boolean remove(final int id) throws JaiberdroidException {
+		return (1L == queryManager.executeUpdate(Query.createDelete(entity.getReferenced(), id)));
 	}
 
 
