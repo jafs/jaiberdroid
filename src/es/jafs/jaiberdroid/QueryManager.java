@@ -103,12 +103,12 @@ final class QueryManager extends SQLiteOpenHelper {
 
 				// Delete values of database.
 				case DELETE:
-					database.delete(query.getEntity().getTableName(), query.getCondition(),
-									query.getArgsArray());
+					rows = database.delete(query.getEntity().getTableName(), query.getCondition(),
+										query.getArgsArray());
 					break;
 
 				default:
-					Log.d(JaiberdroidInstance.LOG_TAG, "Only Insert, Update, Delete are supported");
+					Log.w(JaiberdroidInstance.LOG_TAG, "Only Insert, Update, Delete are supported");
 			}
 
 			if (database.inTransaction()) {
