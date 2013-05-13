@@ -129,11 +129,54 @@ final class QueryManager extends SQLiteOpenHelper {
 
 	/**
 	 * Execute a query in database.
-	 * @param  query        String with query to execute.
-	 * @param  database     Database into execute queries.
+	 * @param       query        String with query to execute.
+	 * @param       database     Database into execute queries.
+	 * @deprecated  Not used in future versions. Please use new executeSql method.
 	 */
 	public void executeUpdate(final String query, final SQLiteDatabase database) throws SQLException {
 		database.execSQL(query);
+	}
+
+
+	/**
+	 * Execute a query in database.
+	 * @param  query        String with query to execute.
+	 * @return Object with results. Can be a List of String array or a single object.
+	 */
+	public List<String[]> executeSql(final String query) throws SQLException {
+		// TODO analyze the query
+		return executeSql(query, getWritableDatabase());
+	}
+
+
+	/**
+	 * Execute a query in database.
+	 * @param  query        String with query to execute.
+	 * @param  database     Database into execute queries.
+	 * @return Object with results. Can be a List of String array or a single object.
+	 */
+	private List<String[]> executeSql(final String query, final SQLiteDatabase database) throws SQLException {
+		final List<String[]> result = new ArrayList<String[]>();
+
+		try {
+			final Cursor cursor = database.rawQuery(query, null);
+			if (cursor.moveToFirst()) {
+				String[] row;
+
+				do {
+					row = new String[cursor.getColumnCount()];
+					for (int j = 0; j < cursor.getColumnCount(); ++j) {
+						row[j] = cursor.getString(j);
+					}
+					result.add(row);
+				} while (cursor.moveToNext());
+			}
+		} catch (final SQLException e) {
+			Log.e(JaiberdroidInstance.LOG_TAG, "Executing sql: " + e.getMessage(), e);
+			throw e;
+		}
+
+		return result;
 	}
 
 
@@ -155,7 +198,7 @@ final class QueryManager extends SQLiteOpenHelper {
 	
 				try {
 					for (String query : queries) {
-						executeUpdate(query, database);
+						database.execSQL(query);
 					}
 	
 					if (database.inTransaction()) {
@@ -171,7 +214,7 @@ final class QueryManager extends SQLiteOpenHelper {
 
 				ok = true;
 			} catch (final SQLException e) {
-				Log.e(JaiberdroidInstance.LOG_TAG, "Opening database: " + e.getMessage(), e);
+				Log.e(JaiberdroidInstance.LOG_TAG, "Problem in update: " + e.getMessage(), e);
 			}
 		}
 

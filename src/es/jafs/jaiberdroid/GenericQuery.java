@@ -138,4 +138,14 @@ public class GenericQuery<T> {
 	public long count() throws JaiberdroidException {
 		return queryManager.executeCountQuery(entity);
 	}
+
+
+	/**
+	 * Executes a generic SQL query.
+	 * @param  sql  SQL query to execute.
+	 * @return A list of array of strings with results.
+	 */
+	protected List<String[]> execSql(final String sql) {
+		return queryManager.executeSql(sql);
+	}
 }

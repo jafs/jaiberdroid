@@ -11,7 +11,7 @@ import android.util.Log;
  * @author  Jose Antonio Fuentes Santiago
  * @version 0.5
  */
-public final class Query {
+public class Query {
 	/**
 	 * Types of queries.
 	 * @author  Jose Antonio Fuentes Santiago
@@ -30,20 +30,26 @@ public final class Query {
 
 
 	/** List of arguments in condition. */
-	private final List<String> args = new ArrayList<String>();
+	protected final List<String> args = new ArrayList<String>();
 
 	/** Table name for the query. */
-	private Entity entity;
+	protected Entity entity;
 	/** Values to insert or update. */
-	private ContentValues values;
+	protected ContentValues values;
 	/** Condition that must comply the query. */
-	private String condition;
+	protected String condition;
 	/** Sets if the query is transaccional. The query is executed between a transaction. */
-	private boolean transactional;
+	protected boolean transactional;
 	/** Type of query. */
-	private Type type;
+	protected Type type;
 	/** Object with data of entity. */
-	private Object object;
+	protected Object object;
+
+	/**
+	 * Private constructor for inheritance.
+	 */
+	protected Query() {
+	}
 
 
 	/**
@@ -177,7 +183,7 @@ public final class Query {
 	 * @return ContentValues object with generated data.
 	 * @throws JaiberdroidException 
 	 */
-	private static ContentValues getValues(final Query query, final boolean id, final List<String> filter) throws JaiberdroidException {
+	protected static ContentValues getValues(final Query query, final boolean id, final List<String> filter) throws JaiberdroidException {
 		final ContentValues values = new ContentValues();
 		final Object object = query.getObject();
 		String name;
@@ -474,6 +480,21 @@ public final class Query {
 	 */
 	public final void setObject(final Object object) {
 		this.object = object;
+	}
+
+
+	/**
+	 * Gets the id of current object if exists.
+	 * @return Integer with id of current object. 0 if the object hasn't id.
+	 */
+	public final int getId() {
+		int id = 0;
+
+		if (null != values && values.containsKey(JaiberdroidSql._ID)) {
+			id = values.getAsInteger(JaiberdroidSql._ID);
+		}
+
+		return id;
 	}
 
 
