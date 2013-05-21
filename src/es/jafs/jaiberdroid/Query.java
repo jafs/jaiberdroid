@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentValues;
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -201,7 +202,9 @@ public class Query {
 
 					// Checks if the value is ok.
 					if (data == null) {
-						if (field.isNull()) {
+						if (!TextUtils.isEmpty(field.getDefaultValue())) {
+							values.put(field.getName(), field.getDefaultValue());
+						} else if (field.isNull()) {
 							values.putNull(field.getName());
 						} else {
 							throw new JaiberdroidException("Field " + field.getName() + " in table "

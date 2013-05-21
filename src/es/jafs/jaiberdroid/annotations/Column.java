@@ -31,4 +31,10 @@ public @interface Column {
 	 * @return Boolean value that indicates if the field can store null values.
 	 */
 	public boolean nullable() default true;
+
+	/**
+	 * Default value for current column (defaults null).
+	 * @return String that indicates default value for current column.
+	 */
+	public String defaultValue() default "";
 }

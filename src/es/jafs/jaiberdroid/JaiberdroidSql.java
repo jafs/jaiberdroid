@@ -30,6 +30,8 @@ final class JaiberdroidSql implements BaseColumns {
 	private static final String AUTOINCREMENT = "AUTOINCREMENT";
 	/** String with UNIQUE constraint name. */
 	private static final String UNIQUE = "UNIQUE";
+	/** String with DEFAULT constraint name. */
+	private static final String DEFAULT = "DEFAULT";
 	/** String with NOT NULL constraint name. */
 	private static final String NOT_NULL = "NOT NULL";
 
@@ -117,6 +119,26 @@ final class JaiberdroidSql implements BaseColumns {
 				if (field.isUnique()) {
 					objSql.append(' ');
 					objSql.append(UNIQUE);
+				}
+				if (!TextUtils.isEmpty(field.getDefaultValue())) {
+					objSql.append(' ');
+					objSql.append(DEFAULT);
+					objSql.append('(');
+
+					switch (field.getType()) {
+						case INTEGER:
+						case REAL:
+							objSql.append(field.getDefaultValue());
+							break;
+
+						default:
+							objSql.append('\'');
+							objSql.append(field.getDefaultValue());
+							objSql.append('\'');
+							break;
+					}
+
+					objSql.append(')');
 				}
 			}
 		}

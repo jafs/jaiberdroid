@@ -32,7 +32,13 @@ public class JaiberdroidReflection {
 	 * @throws JaiberdroidException 
 	 */
 	public static String executeGetMethod(final String name, final Object object) throws JaiberdroidException {
-		return execute(name, object, null, null, true).toString();
+		final Object result = execute(name, object, null, null, true);
+
+		if (null == result) {
+			return null;
+		} else {
+			return result.toString();
+		}
 	}
 
 
@@ -170,20 +176,19 @@ public class JaiberdroidReflection {
 	 */
 	private static Field getColumn(final java.lang.reflect.Field attribute, final Column annotation)
 								throws JaiberdroidException {
-		FieldTypes type = FieldTypes.NULL;
-		String name = null;
-		String typeName = attribute.getType().getName();
-
-		// Load the name.
-		name = attribute.getName();
+		final String name = attribute.getName();
+		final String typeName = attribute.getType().getName();
+		Field field = null;
 
 		if (annotation.primary()) {
 			if (int.class.getName().equals(typeName)) {
-				return new Field(name, int.class);
+				field = new Field(name, int.class);
 			} else {
 				throw new JaiberdroidException("Primary key must be of int type");
 			}
 		} else {
+			FieldTypes type = FieldTypes.NULL;
+
 			// Load the attribute type.
 			if (String.class.getName().equals(typeName)) {
 				type = FieldTypes.TEXT;
@@ -197,13 +202,35 @@ public class JaiberdroidReflection {
 				throw new JaiberdroidException("Invalid data type: " + attribute.getType().getName());
 			}
 
-			// Check if the attribute is null and is primitive type.
+			// If attribute is null and primitive type, but no has annotation launch an exception.
 			if (annotation.nullable() && isPrimitive(attribute.getType())) {
-				throw new JaiberdroidException("Primitive fields must be not null: " + attribute.getName());
+				final StringBuilder error = new StringBuilder();
+				error.append("In field ");
+				error.append(attribute.getName());
+				error.append(". Primitive fields can be nullables.");
+				throw new JaiberdroidException(error.toString());
 			}
 
-			return new Field(name, type, annotation.nullable(), annotation.unique(), attribute.getType());
+			field = new Field(name, type, annotation.nullable(), annotation.unique(), attribute.getType());
+
+			// Cheks the default value if exists.
+			try {
+				if (!TextUtils.isEmpty(annotation.defaultValue())) {
+					if (type.equals(FieldTypes.INTEGER)) {
+						Integer.parseInt(annotation.defaultValue());
+					} else if (type.equals(FieldTypes.REAL)) {
+						Double.parseDouble(annotation.defaultValue());
+					}
+				}
+
+				field.setDefaultValue(annotation.defaultValue());
+			} catch (final NumberFormatException e) {
+				throw new JaiberdroidException("Invalid default value for numeric field: "
+											+ attribute.getName());
+			}
 		}
+
+		return field;
 	}
 
 

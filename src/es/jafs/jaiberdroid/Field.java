@@ -25,6 +25,8 @@ class Field {
 	private boolean unique = false;
 	/** The field is null. */
 	private boolean isnull = true;
+	/** The field has default value. */
+	private String defaultValue = null;
 	/** Class of field. */
 	private Class fieldClass = null;
 
@@ -144,6 +146,24 @@ class Field {
 
 
 	/**
+	 * Gets a string with default value of field.
+	 * @return String with default value of field.
+	 */
+	public final String getDefaultValue() {
+		return defaultValue;
+	}
+
+
+	/**
+	 * Sets a string with default value of field.
+	 * @param  defaultValue  String with default value of field.
+	 */
+	public final void setDefaultValue(final String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+
+	/**
 	 * Gets a string with the object's content.
 	 * @return String with the object's content.
 	 */
@@ -162,6 +182,8 @@ class Field {
 		objSql.append(isnull);
 		objSql.append("; unique->");
 		objSql.append(unique);
+		objSql.append("; default->");
+		objSql.append(defaultValue);
 		objSql.append('}');
 
 		return objSql.toString();
