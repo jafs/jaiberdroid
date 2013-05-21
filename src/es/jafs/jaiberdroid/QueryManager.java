@@ -201,14 +201,14 @@ final class QueryManager extends SQLiteOpenHelper {
 						database.execSQL(query);
 					}
 	
-					if (database.inTransaction()) {
+					if (transaction && database.inTransaction()) {
 						database.setTransactionSuccessful();
 					}
 				} catch (final SQLException e) {
 					Log.e(JaiberdroidInstance.LOG_TAG, "When executing SQL: " + e.getMessage(), e);
 				}
 	
-				if (database.inTransaction()) {
+				if (transaction && database.inTransaction()) {
 					database.endTransaction();
 				}
 
