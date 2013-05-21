@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
 
 
@@ -18,6 +19,9 @@ import android.util.Log;
  * @todo    This class must receive only one query method, and analyzes whats method call.
  */
 final class QueryManager extends SQLiteOpenHelper {
+	/** Log tag for SQL queries. */
+	private static final String SQL_TAG = "sqlop";
+
 	/** Database version. */
 	private static int version = 0;
 	/** Database name. */
@@ -43,7 +47,7 @@ final class QueryManager extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onCreate(final SQLiteDatabase database) {
-		if (!executeUpdates(entityManager.getCreateQueries(), true, database)) {
+		if (!executeUpdates(entityManager.getCreateQueries(), false, database)) {
 			Log.e(JaiberdroidInstance.LOG_TAG, "Problem creating database.");
 		}
 	}
@@ -83,6 +87,8 @@ final class QueryManager extends SQLiteOpenHelper {
 				database.beginTransaction();
 			}
 
+			debugQuery(query);
+
 			switch (query.getType()) {
 				// Inserts a value into the database.
 				case INSERT:
@@ -108,7 +114,7 @@ final class QueryManager extends SQLiteOpenHelper {
 					break;
 
 				default:
-					Log.w(JaiberdroidInstance.LOG_TAG, "Only Insert, Update, Delete are supported");
+					Log.e(JaiberdroidInstance.LOG_TAG, "Only Insert, Update, Delete are supported");
 			}
 
 			if (database.inTransaction()) {
@@ -124,6 +130,42 @@ final class QueryManager extends SQLiteOpenHelper {
 		}
 
 		return rows;
+	}
+
+
+	/**
+	 * Prints a debug trace for a query.
+	 * @param  query  Query to print in debug.
+	 */
+	private static void debugQuery(final Query query) {
+		if (JaiberdroidInstance.isDebug() && null != query) {
+			final StringBuilder message = new StringBuilder();
+
+			message.append(query.getType().name());
+			message.append(" over ");
+			message.append(query.getEntity().getTableName());
+			message.append(" |");
+			if (null != query.getValues() && query.getValues().size() > 0) {
+				message.append(" values [");
+				message.append(query.getValues());
+				message.append("]");
+			}
+			if (!TextUtils.isEmpty(query.getCondition())) {
+				message.append(" condition [");
+				message.append(query.getCondition());
+				message.append("]");
+			}
+			if (null != query.getArgs()) {
+				message.append(" variables [ ");
+				for (int i = 0; i < query.getArgs().size(); ++i) {
+					message.append(query.getArgsArray());
+					message.append(" ");
+				}
+				message.append("]");
+			}
+
+			Log.d(SQL_TAG, message.toString());
+		}
 	}
 
 
@@ -159,6 +201,9 @@ final class QueryManager extends SQLiteOpenHelper {
 		final List<String[]> result = new ArrayList<String[]>();
 
 		try {
+			if (JaiberdroidInstance.isDebug()) {
+				Log.d(SQL_TAG, query);
+			}
 			final Cursor cursor = database.rawQuery(query, null);
 			if (cursor.moveToFirst()) {
 				String[] row;
@@ -193,15 +238,24 @@ final class QueryManager extends SQLiteOpenHelper {
 		if (null != queries) {
 			try {
 				if (transaction) {
+					if (JaiberdroidInstance.isDebug()) {
+						Log.d(SQL_TAG, "BEGIN");
+					}
 					database.beginTransaction();
 				}
 	
 				try {
 					for (String query : queries) {
+						if (JaiberdroidInstance.isDebug()) {
+							Log.d(SQL_TAG, query);
+						}
 						database.execSQL(query);
 					}
 	
 					if (transaction && database.inTransaction()) {
+						if (JaiberdroidInstance.isDebug()) {
+							Log.d(SQL_TAG, "COMMIT");
+						}
 						database.setTransactionSuccessful();
 					}
 				} catch (final SQLException e) {
@@ -209,6 +263,9 @@ final class QueryManager extends SQLiteOpenHelper {
 				}
 	
 				if (transaction && database.inTransaction()) {
+					if (JaiberdroidInstance.isDebug()) {
+						Log.d(SQL_TAG, "END");
+					}
 					database.endTransaction();
 				}
 

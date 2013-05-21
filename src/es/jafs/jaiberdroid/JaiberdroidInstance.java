@@ -34,6 +34,8 @@ public final class JaiberdroidInstance {
 	public static final String CFG_DB_NAME = "jaiberdroid_database";
 	/** Name of field that stores Jaiberdroid database version. */
 	public static final String CFG_DB_VERSION = "jaiberdroid_version";
+	/** Name of field that stores Jaiberdroid debug mode. */
+	public static final String CFG_DEBUG = "jaiberdroid_debug";
 
 	/** Type of data for arrays. */
 	private static final String DATA_ARRAY = "array";
@@ -44,6 +46,8 @@ public final class JaiberdroidInstance {
 	private static JaiberdroidInstance instance;
 	/** Boolean value that sets if instance if started. */
 	private static boolean created = false;
+	/** Indicates if Jaiberdroid is in debug mode. */
+	private static boolean debug = false;
 
 	/** Reference to Entity Manager. */
 	private final EntityManager entityManager = new EntityManager();
@@ -107,6 +111,7 @@ public final class JaiberdroidInstance {
 	 * @throws JaiberdroidException 
 	 */
 	public void startJaiberdroid() throws JaiberdroidException {
+		loadDebug();
 		loadEntities();
 		loadDatabase();
 	}
@@ -203,6 +208,24 @@ public final class JaiberdroidInstance {
 
 
 	/**
+	 * Loads the debug mode.
+	 */
+	private void loadDebug() {
+		try {
+			final String debugRes = context.getResources().getString(context.getResources().getIdentifier(
+																				CFG_DEBUG,
+																				DATA_STRING,
+																				context.getPackageName()));
+			if (null != debugRes && !TextUtils.isEmpty(debugRes)) {
+				debug = (Boolean.TRUE.toString().equalsIgnoreCase(debugRes));
+			}
+		} catch (final NotFoundException e) {
+			Log.i(LOG_TAG, "Debug configuration parameter not found. Debug mode is off");
+		}
+	}
+
+
+	/**
 	 * Gets the Query Manager.
 	 * @return Instance of the Query Manager.
 	 */
@@ -237,5 +260,14 @@ public final class JaiberdroidInstance {
 		}
 
 		return entity;
+	}
+
+
+	/**
+	 * Retuns a boolean value that indicates if Jaiberdroid is in debug mode.
+	 * @return Boolean value that indicates if Jaiberdroid is in debug mode.
+	 */
+	public static boolean isDebug() {
+		return debug;
 	}
 }
