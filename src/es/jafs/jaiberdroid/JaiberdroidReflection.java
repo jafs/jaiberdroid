@@ -15,13 +15,21 @@ import es.jafs.jaiberdroid.annotations.Table;
  */
 public class JaiberdroidReflection {
 	/** Prefix of SET type methods. */
-	public static final String SET_PREFIX = "set";
+	private static final String SET_PREFIX = "set";
 	/** Prefix of GET type methods. */
-	public static final String GET_PREFIX = "get";
+	private static final String GET_PREFIX = "get";
+
 	/** Name of get id method. */
 	public static final String GET_ID = GET_PREFIX + JaiberdroidSql._ID;
 	/** Name of set id method. */
 	public static final String SET_ID = SET_PREFIX + JaiberdroidSql._ID;
+
+
+	/**
+	 * Private constructor for avoid external instances.
+	 */
+	private JaiberdroidReflection() {
+	}
 
 
 	/**
@@ -266,5 +274,25 @@ public class JaiberdroidReflection {
 		methodName.append(name.substring(1));
 
 		return methodName.toString();
+	}
+
+
+	/**
+	 * Gets the name of a method por get parameter received.
+	 * @param  name  Name of parameter to get.
+	 * @return Name of the method generated.
+	 */
+	public static String getMethodGet(final String name) {
+		return getMethodName(GET_PREFIX, name);
+	}
+
+
+	/**
+	 * Gets the name of a method por set parameter received.
+	 * @param  name  Name of parameter to set.
+	 * @return Name of the method generated.
+	 */
+	public static String getMethodSet(final String name) {
+		return getMethodName(SET_PREFIX, name);
 	}
 }

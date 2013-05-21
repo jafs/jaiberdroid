@@ -1,6 +1,5 @@
 package es.jafs.jaiberdroid;
 
-
 /**
  * Data types of SQLite.
  * @author  Jose Antonio Fuentes Santiago

@@ -1,10 +1,5 @@
 package es.jafs.jaiberdroid;
 
-
-
-
-
-
 /**
  * Class that represents a field of a table.<br />
  * Stores the name, type, if is primary key and if is auto increment field. Provides
@@ -14,7 +9,7 @@ package es.jafs.jaiberdroid;
  * @version 0.5
  */
 @SuppressWarnings("rawtypes")
-class Field {
+final class Field {
 	/** Name of the field. */
 	private String name = "";
 	/** Field's data type. */
@@ -36,7 +31,7 @@ class Field {
 	 * @param  name        Name of the field.
 	 * @param  fieldClass  Class type of the field
 	 */
-	public Field(final String name, final Class fieldClass) {
+	Field(final String name, final Class fieldClass) {
 		this.name = name;
 		this.type = FieldTypes.INTEGER;
 		this.primary = true;
@@ -47,12 +42,12 @@ class Field {
 
 
 	/**
-	 * Default constructor with only two params.
+	 * Default constructor with three params.
 	 * @param  name  Name of the field.
 	 * @param  type  Field's data type.
 	 * @param  fieldClass  Class type of the field
 	 */
-	public Field(final String name, final FieldTypes type, final Class fieldClass) {
+	Field(final String name, final FieldTypes type, final Class fieldClass) {
 		this.name = name;
 		this.fieldClass = fieldClass;
 
@@ -70,7 +65,7 @@ class Field {
 	 * @param  unique   The field has unique constraint.
 	 * @param  fieldClass  Class type of the field
 	 */
-	public Field(final String name, final FieldTypes type, final boolean isnull, final boolean unique, final Class fieldClass) {
+	Field(final String name, final FieldTypes type, final boolean isnull, final boolean unique, final Class fieldClass) {
 		this.name = name;
 		this.unique = unique;
 		this.isnull = isnull;
@@ -86,7 +81,7 @@ class Field {
 	 * Gets the name of the field.
 	 * @return String with the name of the field.
 	 */
-	public final String getName() {
+	final String getName() {
 		return name;
 	}
 
@@ -95,7 +90,7 @@ class Field {
 	 * Gets the type of the field.
 	 * @return Enumeration with the type of the field.
 	 */
-	public final FieldTypes getType() {
+	final FieldTypes getType() {
 		return type;
 	}
 
@@ -104,7 +99,7 @@ class Field {
 	 * Gets if the field is primary key.
 	 * @return Boolean that is true if field is primary key.
 	 */
-	public final boolean isPrimary() {
+	final boolean isPrimary() {
 		return primary;
 	}
 
@@ -113,7 +108,7 @@ class Field {
 	 * Gets if the field is unique.
 	 * @return Boolean that is true if field is unique.
 	 */
-	public final boolean isUnique() {
+	final boolean isUnique() {
 		return unique;
 	}
 
@@ -122,7 +117,7 @@ class Field {
 	 * Gets if the field is null.
 	 * @return Boolean that is true if field is null.
 	 */
-	public final boolean isNull() {
+	final boolean isNull() {
 		return isnull;
 	}
 
@@ -131,7 +126,7 @@ class Field {
 	 * Gets the class of the field.
 	 * @return Class of the field.
 	 */
-	public final Class getFieldClass() {
+	final Class getFieldClass() {
 		return fieldClass;
 	}
 
@@ -140,7 +135,7 @@ class Field {
 	 * Sets the class of the field.
 	 * @param  fieldClass  Class of the field.
 	 */
-	public final void setFieldClass(final Class fieldClass) {
+	final void setFieldClass(final Class fieldClass) {
 		this.fieldClass = fieldClass;
 	}
 
@@ -149,7 +144,7 @@ class Field {
 	 * Gets a string with default value of field.
 	 * @return String with default value of field.
 	 */
-	public final String getDefaultValue() {
+	final String getDefaultValue() {
 		return defaultValue;
 	}
 
@@ -158,7 +153,7 @@ class Field {
 	 * Sets a string with default value of field.
 	 * @param  defaultValue  String with default value of field.
 	 */
-	public final void setDefaultValue(final String defaultValue) {
+	final void setDefaultValue(final String defaultValue) {
 		this.defaultValue = defaultValue;
 	}
 

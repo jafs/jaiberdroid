@@ -1,7 +1,5 @@
 package es.jafs.jaiberdroid;
 
-
-
 /**
  * Class that control a exception in Sqlite.
  * @author  Jose Antonio Fuentes Santiago

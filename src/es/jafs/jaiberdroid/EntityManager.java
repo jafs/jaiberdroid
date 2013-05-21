@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * Entity loader for the Jaiberdroid system.
  * @author  Jose Antonio Fuentes Santiago
@@ -17,12 +16,19 @@ final class EntityManager {
 
 
 	/**
+	 * Only for Jaiberdroid package can be instanced.
+	 */
+	EntityManager() {
+	}
+
+
+	/**
 	 * Adds a class to manager.
 	 * @param  type  Type of class to add.
 	 * @throws JaiberdroidException 
 	 */
 	@SuppressWarnings("rawtypes")
-	public void add(final Class type) throws JaiberdroidException {
+	void add(final Class type) throws JaiberdroidException {
 		if (!entities.containsKey(type.getName())) {
 			final Entity entity = JaiberdroidReflection.getEntity(type);
 			if (null != entity) {
@@ -40,16 +46,18 @@ final class EntityManager {
 	 * @return The entity if found or null.
 	 */
 	@SuppressWarnings("rawtypes")
-	public Entity getEntity(final Class type) {
+	Entity getEntity(final Class type) {
 		return entities.get(type.getName());
 	}
 
 
 	/**
 	 * Gets the number of entities loaded.
-	 * @return Numer of entities loaded.
+	 * @return     Numer of entities loaded.
+	 * @deprecated In version 1.0 will be deleted.
+	 * @todo       Delete in 1.0 version.
 	 */
-	public int countEntities() {
+	int countEntities() {
 		return entities.size();
 	}
 
@@ -58,8 +66,8 @@ final class EntityManager {
 	 * Gets all create table queries string.
 	 * @return List with all create table queries.
 	 */
-	public List<String> getCreateQueries() {
-		List<String> queriesList = new ArrayList<String>();
+	List<String> getCreateQueries() {
+		final List<String> queriesList = new ArrayList<String>();
 
 		for (final Entity entity : entities.values()) {
 			queriesList.add(JaiberdroidSql.getCreateSql(entity));
@@ -73,8 +81,8 @@ final class EntityManager {
 	 * Gets all create table queries string.
 	 * @return List with all create table queries.
 	 */
-	public List<String> getDropQueries() {
-		List<String> queriesList = new ArrayList<String>();
+	List<String> getDropQueries() {
+		final List<String> queriesList = new ArrayList<String>();
 
 		for (final Entity entity : entities.values()) {
 			queriesList.add(JaiberdroidSql.getDropSql(entity.getTableName()));

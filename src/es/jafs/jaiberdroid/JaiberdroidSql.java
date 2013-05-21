@@ -44,7 +44,7 @@ final class JaiberdroidSql implements BaseColumns {
 
 
 	/**
-	 * Get the create table SQL sentence.
+	 * Gets the create table SQL sentence.
 	 * @return String with the create table SQL sentence.
 	 */
 	public static String getCreateSql(final Entity entity) {
@@ -62,7 +62,7 @@ final class JaiberdroidSql implements BaseColumns {
 
 
 	/**
-	 * Get the drop table SQL query.
+	 * Gets the drop table SQL query.
 	 * @return String with the drop table SQL query.
 	 */
 	public static String getDropSql(final String table) {

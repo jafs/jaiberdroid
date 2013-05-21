@@ -7,8 +7,6 @@ import android.provider.BaseColumns;
 import android.text.TextUtils;
 import es.jafs.jaiberdroid.utils.ToString;
 
-
-
 /**
  * Class that implements a fields controller.
  * @author  Jose Antonio Fuentes Santiago
@@ -25,7 +23,7 @@ class FieldSet extends ToString implements BaseColumns {
 	 * @throws IllegalArgumentException 
 	 * @see    Field
 	 */
-	public void append(final Field field) throws JaiberdroidException {
+	void append(final Field field) throws JaiberdroidException {
 		if (null == field) {
 			throw new JaiberdroidException("Null field");
 		}
@@ -50,8 +48,10 @@ class FieldSet extends ToString implements BaseColumns {
 	/**
 	 * Deletes a existing field.
 	 * @param  field  Field to detele.
+	 * @deprecated  This method will be deleted in 1.0 version.
+	 * @todo        Delete in 1.0 version.
 	 */
-	public void remove(final Field field) {
+	void remove(final Field field) {
 		if (null != field) {
 			remove(field.getName());
 		}
@@ -61,8 +61,10 @@ class FieldSet extends ToString implements BaseColumns {
 	/**
 	 * Deletes a existing field.
 	 * @param  name  String with the name of the field.
+	 * @deprecated  This method will be deleted in 1.0 version.
+	 * @todo        Delete in 1.0 version.
 	 */
-	public void remove(final String name) {
+	void remove(final String name) {
 		if (null != name && fields.containsKey(name)) {
 			fields.remove(name);
 		}
@@ -72,17 +74,19 @@ class FieldSet extends ToString implements BaseColumns {
 	/**
 	 * Returns a boolean value that indicates is there are fields.
 	 * @return Boolean value that indicates is there are fields.
+	 * @deprecated  This method will be deleted in 1.0 version.
+	 * @todo        Delete in 1.0 version.
 	 */
-	public final boolean isEmpty() {
+	final boolean isEmpty() {
 		return fields.isEmpty();
 	}
 
 
 	/**
-	 * Get te fields of the factory without the key.
+	 * Gets the fields stores in factory.
 	 * @return Map with fields without key.
 	 */
-	public final Map<String, Field> getFields() {
+	final Map<String, Field> getFields() {
 		return fields;
 	}
 
@@ -91,7 +95,7 @@ class FieldSet extends ToString implements BaseColumns {
 	 * Gets if the field set has valid primary key.
 	 * @return Value boolean that indicates if field set has valid primary key.
 	 */
-	public boolean hasKey() {
+	boolean hasKey() {
 		final Field key = fields.get(_ID);
 		return (null != key && key.isPrimary());
 	}
@@ -101,7 +105,7 @@ class FieldSet extends ToString implements BaseColumns {
 	 * Gets an array of fields of current field set.
 	 * @return Array with the names of the fields.
 	 */
-	public String[] getFieldsArray() {
+	String[] getFieldsArray() {
 		final String[] array = new String[fields.size()];
 
 		int i = 0;
@@ -120,7 +124,7 @@ class FieldSet extends ToString implements BaseColumns {
 	 * @return Class of field or null is not find.
 	 */
 	@SuppressWarnings("rawtypes")
-	public Class getFieldClass(final String name) {
+	Class getFieldClass(final String name) {
 		return fields.get(name).getFieldClass();
 	}
 }

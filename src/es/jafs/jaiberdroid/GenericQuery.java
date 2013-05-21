@@ -3,7 +3,6 @@ package es.jafs.jaiberdroid;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-import android.util.Log;
 import es.jafs.jaiberdroid.Query.Type;
 
 /**
@@ -26,19 +25,16 @@ public class GenericQuery<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public GenericQuery() {
-		try {
-			final Class<T> type = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-			entity = JaiberdroidInstance.getInstance().getEntityManager().getEntity(type);
+		final Class<T> type = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 
-			if (null == queryManager) {
-				queryManager = JaiberdroidInstance.getInstance().getQueryManager();
-			}
-			if (null == entityManager) {
-				entityManager = JaiberdroidInstance.getInstance().getEntityManager();
-			}
-		} catch (final IllegalAccessException e) {
-			Log.e(JaiberdroidInstance.LOG_TAG, e.getMessage());
+		if (null == entityManager) {
+			entityManager = JaiberdroidInstance.getEntityManager();
 		}
+		if (null == queryManager) {
+			queryManager = JaiberdroidInstance.getQueryManager();
+		}
+
+		entity = entityManager.getEntity(type);
 	}
 
 

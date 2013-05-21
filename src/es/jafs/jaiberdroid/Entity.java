@@ -2,9 +2,6 @@ package es.jafs.jaiberdroid;
 
 import es.jafs.jaiberdroid.utils.ToString;
 
-
-
-
 /**
  * Interface that represents a Table interface.
  * @author  Jose Antonio Fuentes Santiago
@@ -26,7 +23,7 @@ final class Entity extends ToString {
 	 * Gets a boolean value that indicates if table is loaded.
 	 * @return Boolean value that indicates if table is loaded.
 	 */
-	public boolean isLoaded() {
+	boolean isLoaded() {
 		return loaded;
 	}
 
@@ -35,7 +32,7 @@ final class Entity extends ToString {
 	 * Sets a boolean value that indicates if table is loaded.
 	 * @param  loaded  Boolean value that indicates if table is loaded.
 	 */
-	public void setLoaded(final boolean loaded) {
+	void setLoaded(final boolean loaded) {
 		this.loaded = loaded;
 	}
 
@@ -44,7 +41,7 @@ final class Entity extends ToString {
 	 * Gets the name of the table.
 	 * @return String with name of the table.
 	 */
-	public String getTableName() {
+	String getTableName() {
 		return tableName;
 	}
 
@@ -53,7 +50,7 @@ final class Entity extends ToString {
 	 * Sets the name of the table.
 	 * @param  tableName  String with name of the table.
 	 */
-	public void setTableName(final String tableName) {
+	void setTableName(final String tableName) {
 		this.tableName = tableName;
 	}
 
@@ -62,7 +59,7 @@ final class Entity extends ToString {
 	 * Appends a field to field factory.
 	 * @param  field  Data of field to insert.
 	 */
-	public void appendField(final Field field) throws JaiberdroidException {
+	void appendField(final Field field) throws JaiberdroidException {
 		try {
 			fields.append(field);
 		} catch (final JaiberdroidException e) {
@@ -78,9 +75,11 @@ final class Entity extends ToString {
 
 	/**
 	 * Deletes a existing field.
-	 * @param  field  Field to detele.
+	 * @param  field  Field to detele.ç
+	 * @deprecated  This method will be deleted in 1.0 version.
+	 * @todo        Delete in 1.0 version.
 	 */
-	public void removeField(final Field field) {
+	void removeField(final Field field) {
 		fields.remove(field);
 	}
 
@@ -88,8 +87,10 @@ final class Entity extends ToString {
 	/**
 	 * Deletes a existing field.
 	 * @param  name  String with the name of the field.
+	 * @deprecated  This method will be deleted in 1.0 version.
+	 * @todo        Delete in 1.0 version.
 	 */
-	public void removeField(final String name) {
+	void removeField(final String name) {
 		fields.remove(name);
 	}
 
@@ -98,7 +99,7 @@ final class Entity extends ToString {
 	 * Gets a field factory.
 	 * @return Object with field factory.
 	 */
-	public FieldSet getFields() {
+	FieldSet getFields() {
 		return fields;
 	}
 
@@ -107,7 +108,7 @@ final class Entity extends ToString {
 	 * Returns a value that indicates if current entity has a valid primary key.
 	 * @return Value boolean that indicates if entity has valid primary key.
 	 */
-	public boolean hasKey() {
+	boolean hasKey() {
 		return fields.hasKey();
 	}
 
@@ -117,7 +118,7 @@ final class Entity extends ToString {
 	 * @return Class linked with this entity.
 	 */
 	@SuppressWarnings("rawtypes")
-	public final Class getReferenced() {
+	Class getReferenced() {
 		return referenced;
 	}
 
@@ -127,7 +128,7 @@ final class Entity extends ToString {
 	 * @param  referenced  Class linked with this entity.
 	 */
 	@SuppressWarnings("rawtypes")
-	public final void setReferenced(final Class referenced) {
+	void setReferenced(final Class referenced) {
 		this.referenced = referenced;
 	}
 }

@@ -5,7 +5,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Class that prints attributes in classes that inherited from it.
  * @author  Jose Antonio Fuentes Santiago

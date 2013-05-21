@@ -6,7 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
  * Is used to specify the mapped tables.
  * @author  Jose Antonio Fuentes Santiago

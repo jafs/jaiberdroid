@@ -11,7 +11,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 import android.util.Log;
 
-
 /**
  * Class that execute and control the querys.
  * @author  Jose Antonio Fuentes Santiago
@@ -22,20 +21,20 @@ final class QueryManager extends SQLiteOpenHelper {
 	/** Log tag for SQL queries. */
 	private static final String SQL_TAG = "sqlop";
 
-	/** Database version. */
-	private static int version = 0;
-	/** Database name. */
-	private static String name = "";
-
 	/** Instance of Entity Manager. */
 	private EntityManager entityManager;
 
 
 	/**
 	 * Default constructor of the class.
+	 * @param  context        Application context.
+	 * @param  entityManager  Entity manager for persistence.
+	 * @param  version        Database version.
+	 * @param  name           Name of database.
 	 * @throws JaiberdroidException 
 	 */
-	public QueryManager(final Context context, final EntityManager entityManager) throws JaiberdroidException {
+	QueryManager(final Context context, final EntityManager entityManager, final int version,
+				final String name) throws JaiberdroidException {
 		super(context, name, null, version);
 		this.entityManager = entityManager;
 	}
@@ -77,7 +76,7 @@ final class QueryManager extends SQLiteOpenHelper {
 	 * @return Number of rows affected. -1 if there an error.
 	 * @throws JaiberdroidException 
 	 */
-	public long executeUpdate(final Query query) throws JaiberdroidException {
+	long executeUpdate(final Query query) throws JaiberdroidException {
 		long rows = -1;
 
 		try {
@@ -175,7 +174,7 @@ final class QueryManager extends SQLiteOpenHelper {
 	 * @param       database     Database into execute queries.
 	 * @deprecated  Not used in future versions. Please use new executeSql method.
 	 */
-	public void executeUpdate(final String query, final SQLiteDatabase database) throws SQLException {
+	void executeUpdate(final String query, final SQLiteDatabase database) throws SQLException {
 		database.execSQL(query);
 	}
 
@@ -185,7 +184,7 @@ final class QueryManager extends SQLiteOpenHelper {
 	 * @param  query        String with query to execute.
 	 * @return Object with results. Can be a List of String array or a single object.
 	 */
-	public List<String[]> executeSql(final String query) throws SQLException {
+	List<String[]> executeSql(final String query) throws SQLException {
 		// TODO analyze the query
 		return executeSql(query, getWritableDatabase());
 	}
@@ -285,7 +284,7 @@ final class QueryManager extends SQLiteOpenHelper {
 	 * @return List of results or null is there an error.
 	 * @throws JaiberdroidException 
 	 */
-	public List<Object> executeQueryEntity(final Query query) throws JaiberdroidException {
+	List<Object> executeQueryEntity(final Query query) throws JaiberdroidException {
 		List<Object> results = null;
 
 		// Checks if query is SELECT type.
@@ -320,7 +319,7 @@ final class QueryManager extends SQLiteOpenHelper {
 	 * @return List of results or null is there an error.
 	 * @throws JaiberdroidException 
 	 */
-	public long executeCountQuery(final Entity entity) throws JaiberdroidException {
+	long executeCountQuery(final Entity entity) throws JaiberdroidException {
 		long count = 0;
 
 		try {
@@ -347,7 +346,7 @@ final class QueryManager extends SQLiteOpenHelper {
 				result = entity.getReferenced().newInstance();
 				for (String column : cursor.getColumnNames()) {
 					Class type = entity.getFields().getFieldClass(column);
-					String name = JaiberdroidReflection.getMethodName(JaiberdroidReflection.SET_PREFIX, column);
+					String name = JaiberdroidReflection.getMethodSet(column);
 					int pos = cursor.getColumnIndex(column);
 
 					if (int.class.equals(type) || Integer.class.equals(type)) {
@@ -376,35 +375,41 @@ final class QueryManager extends SQLiteOpenHelper {
 	/**
 	 * Gets the current version of database.
 	 * @return Integer with current version of database.
+	 * @deprecated In version 1.0 will be deleted.
+	 * @todo       Delete in 1.0 version.
 	 */
-	public static final int getVersion() {
-		return version;
+	static final int getVersion() {
+		return 1;
 	}
 
 
 	/**
 	 * Sets the current version of database.
 	 * @param  version  Integer with current version of database.
+	 * @deprecated In version 1.0 will be deleted.
+	 * @todo       Delete in 1.0 version.
 	 */
-	public static final void setVersion(final int version) {
-		QueryManager.version = version;
+	static final void setVersion(final int version) {
 	}
 
 
 	/**
 	 * Gets a String with database's name.
 	 * @return String with database's name.
+	 * @deprecated In version 1.0 will be deleted.
+	 * @todo       Delete in 1.0 version.
 	 */
-	public static final String getName() {
-		return name;
+	static final String getName() {
+		return null;
 	}
 
 
 	/**
 	 * Sets a String with database's name.
 	 * @param  name  String with database's name.
+	 * @deprecated In version 1.0 will be deleted.
+	 * @todo       Delete in 1.0 version.
 	 */
-	public static final void setName(String name) {
-		QueryManager.name = name;
+	static final void setName(String name) {
 	}
 }

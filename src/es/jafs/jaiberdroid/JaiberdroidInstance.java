@@ -8,9 +8,6 @@ import android.util.Log;
 
 import java.lang.IllegalAccessException;
 
-
-
-
 /**
  * <p>Jaiberdroid main class. This must be instanciated to initialize the Jaiberdroid system.</p>
  * <p>First we must call to createInstance() method. This method receives the application context. In second,
@@ -26,16 +23,16 @@ import java.lang.IllegalAccessException;
  */
 public final class JaiberdroidInstance {
 	/** Tag name for log. */
-	public static final String LOG_TAG = "jaiberdroid";
+	static final String LOG_TAG = "jaiberdroid";
 
 	/** Name of field that stores Jaiberdroid Entities list. */
-	public static final String CFG_ENTITIES = "jaiberdroid_entities";
+	private static final String CFG_ENTITIES = "jaiberdroid_entities";
 	/** Name of field that stores Jaiberdroid database name. */
-	public static final String CFG_DB_NAME = "jaiberdroid_database";
+	private static final String CFG_DB_NAME = "jaiberdroid_database";
 	/** Name of field that stores Jaiberdroid database version. */
-	public static final String CFG_DB_VERSION = "jaiberdroid_version";
+	private static final String CFG_DB_VERSION = "jaiberdroid_version";
 	/** Name of field that stores Jaiberdroid debug mode. */
-	public static final String CFG_DEBUG = "jaiberdroid_debug";
+	private static final String CFG_DEBUG = "jaiberdroid_debug";
 
 	/** Type of data for arrays. */
 	private static final String DATA_ARRAY = "array";
@@ -56,6 +53,8 @@ public final class JaiberdroidInstance {
 	private Context context;
 	/** Instance of Query Manager. */
 	private QueryManager queryManager;
+	private String database;
+	private int version;
 
 
 	/**
@@ -110,7 +109,7 @@ public final class JaiberdroidInstance {
 	 * Starts the Jaiberdroid system.
 	 * @throws JaiberdroidException 
 	 */
-	public void startJaiberdroid() throws JaiberdroidException {
+	private void startJaiberdroid() throws JaiberdroidException {
 		loadDebug();
 		loadEntities();
 		loadDatabase();
@@ -129,7 +128,7 @@ public final class JaiberdroidInstance {
 	/**
 	 * Stops the Jaiberdroid system.
 	 */
-	public void stopJaiberdroid() {
+	private void stopJaiberdroid() {
 		SQLiteDatabase.releaseMemory();
 		entityManager.clear();
 	}
@@ -143,7 +142,7 @@ public final class JaiberdroidInstance {
 		loadVersion();
 		loadName();
 
-		queryManager = new QueryManager(context, entityManager);
+		queryManager = new QueryManager(context, entityManager, version, database);
 	}
 
 
@@ -173,11 +172,10 @@ public final class JaiberdroidInstance {
 	 */
 	private void loadVersion() throws JaiberdroidException {
 		try {
-			QueryManager.setVersion(Integer.parseInt(context.getResources().getString(
-																context.getResources().getIdentifier(
+			version = Integer.parseInt(context.getResources().getString(context.getResources().getIdentifier(
 																				CFG_DB_VERSION,
 																				DATA_STRING,
-																				context.getPackageName()))));
+																				context.getPackageName())));
 		} catch (final NotFoundException e) {
 			throw new JaiberdroidException("The resource " + CFG_DB_VERSION + " doesn't exits");
 		} catch (final NumberFormatException e) {
@@ -192,14 +190,12 @@ public final class JaiberdroidInstance {
 	 */
 	private void loadName() throws JaiberdroidException {
 		try {
-			final String database = context.getResources().getString(context.getResources().getIdentifier(
+			database = context.getResources().getString(context.getResources().getIdentifier(
 																				CFG_DB_NAME,
 																				DATA_STRING,
 																				context.getPackageName()));
 			if (null == database && TextUtils.isEmpty(database)) {
 				throw new JaiberdroidException("Database name can't be empty");
-			} else {
-				QueryManager.setName(database);
 			}
 		} catch (final NotFoundException e) {
 			throw new JaiberdroidException("The resource " + CFG_DB_NAME + " doesn't exits");
@@ -229,8 +225,12 @@ public final class JaiberdroidInstance {
 	 * Gets the Query Manager.
 	 * @return Instance of the Query Manager.
 	 */
-	QueryManager getQueryManager() {
-		return queryManager;
+	static QueryManager getQueryManager() {
+		try {
+			return getInstance().queryManager;
+		} catch (final IllegalAccessException e) {
+			return null;
+		}
 	}
 
 
@@ -238,8 +238,12 @@ public final class JaiberdroidInstance {
 	 * Gets the Entity Manager.
 	 * @return Instance of the Entity Manager.
 	 */
-	EntityManager getEntityManager() {
-		return entityManager;
+	static EntityManager getEntityManager() {
+		try {
+			return getInstance().entityManager;
+		} catch (final IllegalAccessException e) {
+			return null;
+		}
 	}
 
 
@@ -248,18 +252,12 @@ public final class JaiberdroidInstance {
 	 * @param  type  Type of entity to search.
 	 * @return Entity finded or null when error.
 	 * @throws JaiberdroidException 
+	 * @deprecated  This method will be deleted in 1.0 version.
+	 * @todo        Delete in 1.0 version.
 	 */
 	@SuppressWarnings("rawtypes")
 	static Entity getEntity(final Class type) throws JaiberdroidException {
-		Entity entity = null;
-
-		try {
-			entity = getInstance().getEntityManager().getEntity(type);
-		} catch (final IllegalAccessException e) {
-			throw new JaiberdroidException(e.getMessage());
-		}
-
-		return entity;
+		return getEntityManager().getEntity(type);
 	}
 
 
