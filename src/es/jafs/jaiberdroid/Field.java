@@ -37,6 +37,10 @@ final class Field {
 	private boolean isnull = true;
 	/** The field has default value. */
 	private String defaultValue = null;
+	/** The current field must be indexed. */
+	private boolean index = false;
+	/** Ascendent order when current column is indexed. */
+	private boolean ascOrder = true;
 	/** Class of field. */
 	private Class fieldClass = null;
 
@@ -170,6 +174,42 @@ final class Field {
 	 */
 	final void setDefaultValue(final String defaultValue) {
 		this.defaultValue = defaultValue;
+	}
+
+
+	/**
+	 * Gets a boolean value that indicates if current field must be indexed.
+	 * @return Boolean value that indicates if current field must be indexed.
+	 */
+	final boolean isIndex() {
+		return index;
+	}
+
+
+	/**
+	 * Sets a boolean value that indicates if current field must be indexed.
+	 * @param  index  Boolean value that indicates if current field must be indexed.
+	 */
+	final void setIndex(final boolean index) {
+		this.index = index;
+	}
+
+
+	/**
+	 * Gets a boolean value that indicates if index must be ordered ascending.
+	 * @return Boolean value that indicates if index must be ordered ascending.
+	 */
+	final boolean isAscOrder() {
+		return ascOrder;
+	}
+
+
+	/**
+	 * Sets a boolean value that indicates if index must be ordered ascending.
+	 * @param ascOrder Boolean value that indicates if index must be ordered ascending.
+	 */
+	final void setAscOrder(final boolean ascOrder) {
+		this.ascOrder = ascOrder;
 	}
 
 

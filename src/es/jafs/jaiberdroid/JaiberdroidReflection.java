@@ -251,6 +251,10 @@ public class JaiberdroidReflection {
 				throw new JaiberdroidException("Invalid default value for numeric field: "
 											+ attribute.getName());
 			}
+
+			// Configure the index value.
+			field.setIndex(annotation.index());
+			field.setAscOrder(annotation.ascOrder());
 		}
 
 		return field;

@@ -15,6 +15,8 @@
  */
 package es.jafs.jaiberdroid;
 
+import java.util.Map;
+
 import es.jafs.jaiberdroid.utils.ToString;
 
 /**
@@ -125,6 +127,27 @@ final class Entity extends ToString {
 	 */
 	boolean hasKey() {
 		return fields.hasKey();
+	}
+
+
+	/**
+	 * Returns a boolean value that indicates if the entity has index fields.
+	 * @return Boolean value that indicates if the entity has index fields.
+	 */
+	boolean hasIndexes() {
+		final Map<String, Field> fieldsMap = fields.getFields();
+		boolean index = false;
+
+		if (null != fieldsMap) {
+			for (final Field field : fieldsMap.values()) {
+				if (field.isIndex()) {
+					index = true;
+					break;
+				}
+			}
+		}
+
+		return index;
 	}
 
 

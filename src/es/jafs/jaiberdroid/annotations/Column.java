@@ -47,8 +47,20 @@ public @interface Column {
 	public boolean nullable() default true;
 
 	/**
-	 * Default value for current column (defaults null).
+	 * Default value for current column (defaults "").
 	 * @return String that indicates default value for current column.
 	 */
 	public String defaultValue() default "";
+
+	/**
+	 * Current column must be indexed (defaults false).
+	 * @return Boolean value that indicates if current column is an index.
+	 */
+	public boolean index() default false;
+
+	/**
+	 * Ascendent order when current column is indexed (defaults true).
+	 * @return Boolean value that indicates order in index.
+	 */
+	public boolean ascOrder() default true;
 }

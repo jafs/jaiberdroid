@@ -15,6 +15,10 @@
  */
 package es.jafs.jaiberdroid;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 
@@ -38,6 +42,18 @@ final class JaiberdroidSql implements BaseColumns {
 	private static final char SQL_FUNCTION_INI = '(';
 	/** End of count function. */
 	private static final char SQL_FUNCTION_END = ')';
+	/** Start of create index command. */
+	private static final String CREATE_INDEX = "CREATE INDEX ";
+	/** Prefix before table name in index. */
+	private static final String INDEX_ON = " ON ";
+	/** Index of type ascending. */
+	private static final String INDEX_ASC = "ASC";
+	/** Index of type descending. */
+	private static final String INDEX_DESC = "DESC";
+	/** Prefix of indexes names. */
+	private static final String INDEX_PREFIX = "index";
+	/** Separator in index name. */
+	private static final char INDEX_SEPARATOR = '_';
 
 	/** String with PRIMARY KEY constraint name. */
 	private static final String PRIMARY_KEY = "PRIMARY KEY";
@@ -73,6 +89,46 @@ final class JaiberdroidSql implements BaseColumns {
 		objSql.append(SQL_FUNCTION_END);
 
 		return objSql.toString();
+	}
+
+
+	/**
+	 * Gets a list of string with Create Index queries for current entity.
+	 * @param  entity  Entity to analyze.
+	 * @return List of string with Create Index queries.
+	 */
+	public static List<String> getCreateIndex(final Entity entity) {
+		final List<String> queries = new ArrayList<String>();
+		final Map<String, Field> fields = entity.getFields().getFields();
+		final StringBuilder objSql = new StringBuilder();
+
+		// Make Create Index sentences for al indexes.
+		for (Field field : fields.values()) {
+			if (field.isIndex()) {
+				objSql.setLength(0);
+				objSql.append(CREATE_INDEX);
+				objSql.append(INDEX_PREFIX);
+				objSql.append(INDEX_SEPARATOR);
+				objSql.append(entity.getTableName());
+				objSql.append(INDEX_SEPARATOR);
+				objSql.append(field.getName());
+				objSql.append(INDEX_ON);
+				objSql.append(entity.getTableName());
+				objSql.append(SQL_FUNCTION_INI);
+				objSql.append(field.getName());
+				objSql.append(' ');
+				if (field.isAscOrder()) {
+					objSql.append(INDEX_ASC);
+				} else {
+					objSql.append(INDEX_DESC);
+				}
+				objSql.append(SQL_FUNCTION_END);
+
+				queries.add(objSql.toString());
+			}
+		}
+
+		return queries;
 	}
 
 

@@ -86,6 +86,11 @@ final class EntityManager {
 
 		for (final Entity entity : entities.values()) {
 			queriesList.add(JaiberdroidSql.getCreateSql(entity));
+
+			// Puts Create Index queries into list.
+			if (entity.hasIndexes()) {
+				queriesList.addAll(JaiberdroidSql.getCreateIndex(entity));
+			}
 		}
 
 		return queriesList;
