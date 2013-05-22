@@ -29,12 +29,11 @@ import es.jafs.jaiberdroid.utils.ContextLoader;
  * requires downloading the entire project and link. The second is more simple because you only have to add
  * jaiberdroid.x.x.jar file.</p>
  * <h3>Method 1: Link the project</h3>
- * <ol>
- * <li>Once downloaded Jaiberdroid project, will be imported to the environment. </li>
+ * <h4>Eclipse</h4>
+ * <ol><li>Once downloaded Jaiberdroid project, will be imported to the environment. </li>
  * <li>Now in your project, open its properties (right click on the project, <b>Settings</b> option). </li>
  * <li>On the <b>Android</b> tab, section <b>Library</b>, click the <b>Add...</b> button and select your
- * project.</li>
- * </ol>
+ * project.</li></ol>
  * <blockquote><b>Note</b>: has certainty that there are problems with the link library projects if they are
  * not in the same directory, so it's good to have your project and Jaiberdroid in the same
  * directory.</blockquote>
@@ -363,20 +362,6 @@ public final class JaiberdroidInstance {
 		} catch (final IllegalAccessException e) {
 			return null;
 		}
-	}
-
-
-	/**
-	 * Gets an entity with it's type.
-	 * @param  type  Type of entity to search.
-	 * @return Entity finded or null when error.
-	 * @throws JaiberdroidException When a problem appears in entity search.
-	 * @deprecated  This method will be deleted in 1.0 version.
-	 * @todo        Will be deleted in 1.0 version.
-	 */
-	@SuppressWarnings("rawtypes")
-	static Entity getEntity(final Class type) throws JaiberdroidException {
-		return getEntityManager().getEntity(type);
 	}
 
 

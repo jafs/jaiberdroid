@@ -91,28 +91,6 @@ final class Entity extends ToString {
 
 
 	/**
-	 * Deletes a existing field.
-	 * @param  field  Field to detele.ç
-	 * @deprecated  This method will be deleted in 1.0 version.
-	 * @todo        Delete in 1.0 version.
-	 */
-	void removeField(final Field field) {
-		fields.remove(field);
-	}
-
-
-	/**
-	 * Deletes a existing field.
-	 * @param  name  String with the name of the field.
-	 * @deprecated  This method will be deleted in 1.0 version.
-	 * @todo        Delete in 1.0 version.
-	 */
-	void removeField(final String name) {
-		fields.remove(name);
-	}
-
-
-	/**
 	 * Gets a field factory.
 	 * @return Object with field factory.
 	 */

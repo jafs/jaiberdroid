@@ -185,17 +185,6 @@ final class QueryManager extends SQLiteOpenHelper {
 
 	/**
 	 * Execute a query in database.
-	 * @param       query        String with query to execute.
-	 * @param       database     Database into execute queries.
-	 * @deprecated  Not used in future versions. Please use new executeSql method.
-	 */
-	void executeUpdate(final String query, final SQLiteDatabase database) throws SQLException {
-		database.execSQL(query);
-	}
-
-
-	/**
-	 * Execute a query in database.
 	 * @param  query        String with query to execute.
 	 * @return Object with results. Can be a List of String array or a single object.
 	 */
@@ -352,6 +341,13 @@ final class QueryManager extends SQLiteOpenHelper {
 	}
 
 
+	/**
+	 * Extracts object data from a cursor and an entity.
+	 * @param  cursor  Cursor with results of a query.
+	 * @param  entity  Entity to extract.
+	 * @return Object of type of entity class.
+	 * @throws JaiberdroidException When a problem occurs.
+	 */
 	@SuppressWarnings("rawtypes")
 	private Object getObject(final Cursor cursor, final Entity entity) throws JaiberdroidException {
 		Object result = null;
@@ -359,10 +355,14 @@ final class QueryManager extends SQLiteOpenHelper {
 		if (null != cursor && cursor.getCount() > 0) {
 			try {
 				result = entity.getReferenced().newInstance();
+				Class type;
+				String name;
+				int pos;
+
 				for (String column : cursor.getColumnNames()) {
-					Class type = entity.getFields().getFieldClass(column);
-					String name = JaiberdroidReflection.getMethodSet(column);
-					int pos = cursor.getColumnIndex(column);
+					type = entity.getFields().getFieldClass(column);
+					name = JaiberdroidReflection.getMethodSet(column);
+					pos = cursor.getColumnIndex(column);
 
 					if (int.class.equals(type) || Integer.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getInt(pos));
@@ -376,55 +376,13 @@ final class QueryManager extends SQLiteOpenHelper {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getDouble(pos));
 					}
 				}
-			} catch (IllegalAccessException e) {
+			} catch (final IllegalAccessException e) {
 				e.printStackTrace();
-			} catch (InstantiationException e) {
+			} catch (final InstantiationException e) {
 				e.printStackTrace();
 			}
 		}
 
 		return result;
-	}
-
-
-	/**
-	 * Gets the current version of database.
-	 * @return Integer with current version of database.
-	 * @deprecated In version 1.0 will be deleted.
-	 * @todo       Delete in 1.0 version.
-	 */
-	static final int getVersion() {
-		return 1;
-	}
-
-
-	/**
-	 * Sets the current version of database.
-	 * @param  version  Integer with current version of database.
-	 * @deprecated In version 1.0 will be deleted.
-	 * @todo       Delete in 1.0 version.
-	 */
-	static final void setVersion(final int version) {
-	}
-
-
-	/**
-	 * Gets a String with database's name.
-	 * @return String with database's name.
-	 * @deprecated In version 1.0 will be deleted.
-	 * @todo       Delete in 1.0 version.
-	 */
-	static final String getName() {
-		return null;
-	}
-
-
-	/**
-	 * Sets a String with database's name.
-	 * @param  name  String with database's name.
-	 * @deprecated In version 1.0 will be deleted.
-	 * @todo       Delete in 1.0 version.
-	 */
-	static final void setName(String name) {
 	}
 }

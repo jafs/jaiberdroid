@@ -67,17 +67,6 @@ final class EntityManager {
 
 
 	/**
-	 * Gets the number of entities loaded.
-	 * @return     Numer of entities loaded.
-	 * @deprecated In version 1.0 will be deleted.
-	 * @todo       Delete in 1.0 version.
-	 */
-	int countEntities() {
-		return entities.size();
-	}
-
-
-	/**
 	 * Gets all create table queries string.
 	 * @return List with all create table queries.
 	 */

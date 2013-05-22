@@ -61,43 +61,6 @@ class FieldSet extends ToString implements BaseColumns {
 
 
 	/**
-	 * Deletes a existing field.
-	 * @param  field  Field to detele.
-	 * @deprecated  This method will be deleted in 1.0 version.
-	 * @todo        Delete in 1.0 version.
-	 */
-	void remove(final Field field) {
-		if (null != field) {
-			remove(field.getName());
-		}
-	}
-
-
-	/**
-	 * Deletes a existing field.
-	 * @param  name  String with the name of the field.
-	 * @deprecated  This method will be deleted in 1.0 version.
-	 * @todo        Delete in 1.0 version.
-	 */
-	void remove(final String name) {
-		if (null != name && fields.containsKey(name)) {
-			fields.remove(name);
-		}
-	}
-
-
-	/**
-	 * Returns a boolean value that indicates is there are fields.
-	 * @return Boolean value that indicates is there are fields.
-	 * @deprecated  This method will be deleted in 1.0 version.
-	 * @todo        Delete in 1.0 version.
-	 */
-	final boolean isEmpty() {
-		return fields.isEmpty();
-	}
-
-
-	/**
 	 * Gets the fields stores in factory.
 	 * @return Map with fields without key.
 	 */
