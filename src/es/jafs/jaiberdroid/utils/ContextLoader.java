@@ -197,8 +197,8 @@ public class ContextLoader {
 
 
 	/**
-	 * Returns an integer value with database versión.
-	 * @return Integer value with database versión.
+	 * Returns an integer value with database version.
+	 * @return Integer value with database version.
 	 */
 	public int getVersion() {
 		return version;
