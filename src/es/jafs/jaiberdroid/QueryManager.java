@@ -86,12 +86,64 @@ final class QueryManager extends SQLiteOpenHelper {
 
 
 	/**
+	 * Executes a query and return its result.
+	 * @param  query  Query to execute.
+	 * @return Object with result of query.
+	 * @throws JaiberdroidException When there is an error on query.
+	 */
+	Object executeQuery(final Query query) throws JaiberdroidException {
+		if (Query.Type.SELECT.equals(query.getType())) {
+			return executeEntity(query);
+		} else {
+			return executeUpdate(query);
+		}
+	}
+
+
+	/**
+	 * Execute a query in database.
+	 * @param  query  String with query to execute.
+	 * @return Object with results. Can be a List of String array or a single object.
+	 */
+	Object executeQuery(final String query) {
+		List<String[]> result = null;
+
+		try {
+			// TODO analyze the query (can be an update).
+			final SQLiteDatabase database = getWritableDatabase();
+			result = new ArrayList<String[]>();
+
+			if (JaiberdroidInstance.isDebug()) {
+				Log.d(SQL_TAG, query);
+			}
+			final Cursor cursor = database.rawQuery(query, null);
+			if (cursor.moveToFirst()) {
+				String[] row;
+
+				do {
+					row = new String[cursor.getColumnCount()];
+					for (int j = 0; j < cursor.getColumnCount(); ++j) {
+						row[j] = cursor.getString(j);
+					}
+					result.add(row);
+				} while (cursor.moveToNext());
+			}
+			cursor.close();
+		} catch (final SQLException e) {
+			Log.e(JaiberdroidInstance.LOG_TAG, "Executing sql: " + e.getMessage(), e);
+		}
+
+		return result;
+	}
+
+
+	/**
 	 * Executes an update with received query.
 	 * @param  query  Query to execute.
 	 * @return Number of rows affected. -1 if there an error.
-	 * @throws JaiberdroidException 
+	 * @throws JaiberdroidException When there is an error on query.
 	 */
-	long executeUpdate(final Query query) throws JaiberdroidException {
+	private long executeUpdate(final Query query) throws JaiberdroidException {
 		long rows = -1;
 
 		try {
@@ -148,6 +200,41 @@ final class QueryManager extends SQLiteOpenHelper {
 
 
 	/**
+	 * Executes a query that returns data of an entity.
+	 * @param  query  Query to execute.
+	 * @return List of results or null is there an error.
+	 * @throws JaiberdroidException When there is an error on query.
+	 */
+	private List<Object> executeEntity(final Query query) throws JaiberdroidException {
+		List<Object> results = null;
+
+		// Checks if query is SELECT type.
+		if (Query.Type.SELECT.equals(query.getType())) {
+			try {
+				final SQLiteDatabase database = getWritableDatabase();
+
+				final Cursor cursor = database.query(query.getEntity().getTableName(), query.getFields(),
+													query.getCondition(), query.getArgsArray(), null, null,
+													null);
+
+				if (cursor.moveToFirst()) {
+					results = new ArrayList<Object>();
+
+					do {
+						results.add(getObject(cursor, query.getEntity()));
+					} while (cursor.moveToNext());
+				}
+				cursor.close();
+			} catch (final SQLException e) {
+				Log.e(JaiberdroidInstance.LOG_TAG, "When executing a query: " + e.getMessage(), e);
+			}
+		}
+
+		return results;
+	}
+
+
+	/**
 	 * Prints a debug trace for a query.
 	 * @param  query  Query to print in debug.
 	 */
@@ -180,43 +267,6 @@ final class QueryManager extends SQLiteOpenHelper {
 
 			Log.d(SQL_TAG, message.toString());
 		}
-	}
-
-
-	/**
-	 * Execute a query in database.
-	 * @param  query        String with query to execute.
-	 * @param  database     Database into execute queries.
-	 * @return Object with results. Can be a List of String array or a single object.
-	 */
-	List<String[]> executeSql(final String query) throws SQLException {
-		final List<String[]> result = new ArrayList<String[]>();
-
-		try {
-			// TODO analyze the query
-			final SQLiteDatabase database = getWritableDatabase();
-
-			if (JaiberdroidInstance.isDebug()) {
-				Log.d(SQL_TAG, query);
-			}
-			final Cursor cursor = database.rawQuery(query, null);
-			if (cursor.moveToFirst()) {
-				String[] row;
-
-				do {
-					row = new String[cursor.getColumnCount()];
-					for (int j = 0; j < cursor.getColumnCount(); ++j) {
-						row[j] = cursor.getString(j);
-					}
-					result.add(row);
-				} while (cursor.moveToNext());
-			}
-		} catch (final SQLException e) {
-			Log.e(JaiberdroidInstance.LOG_TAG, "Executing sql: " + e.getMessage(), e);
-			throw e;
-		}
-
-		return result;
 	}
 
 
@@ -271,41 +321,6 @@ final class QueryManager extends SQLiteOpenHelper {
 		}
 
 		return ok;
-	}
-
-
-	/**
-	 * Executes a query that returns data of an entity.
-	 * @param  query  Query to execute.
-	 * @return List of results or null is there an error.
-	 * @throws JaiberdroidException 
-	 */
-	List<Object> executeQueryEntity(final Query query) throws JaiberdroidException {
-		List<Object> results = null;
-
-		// Checks if query is SELECT type.
-		if (Query.Type.SELECT.equals(query.getType())) {
-			try {
-				final SQLiteDatabase database = getWritableDatabase();
-
-				final Cursor cursor = database.query(query.getEntity().getTableName(), query.getFields(),
-													query.getCondition(), query.getArgsArray(), null, null,
-													null);
-
-				if (cursor.moveToFirst()) {
-					results = new ArrayList<Object>();
-
-					do {
-						results.add(getObject(cursor, query.getEntity()));
-					} while (cursor.moveToNext());
-				}
-				cursor.close();
-			} catch (final SQLException e) {
-				Log.e(JaiberdroidInstance.LOG_TAG, "When executing a query: " + e.getMessage(), e);
-			}
-		}
-
-		return results;
 	}
 
 
