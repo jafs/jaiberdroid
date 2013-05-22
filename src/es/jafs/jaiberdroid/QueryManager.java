@@ -186,24 +186,16 @@ final class QueryManager extends SQLiteOpenHelper {
 	/**
 	 * Execute a query in database.
 	 * @param  query        String with query to execute.
-	 * @return Object with results. Can be a List of String array or a single object.
-	 */
-	List<String[]> executeSql(final String query) throws SQLException {
-		// TODO analyze the query
-		return executeSql(query, getWritableDatabase());
-	}
-
-
-	/**
-	 * Execute a query in database.
-	 * @param  query        String with query to execute.
 	 * @param  database     Database into execute queries.
 	 * @return Object with results. Can be a List of String array or a single object.
 	 */
-	private List<String[]> executeSql(final String query, final SQLiteDatabase database) throws SQLException {
+	List<String[]> executeSql(final String query) throws SQLException {
 		final List<String[]> result = new ArrayList<String[]>();
 
 		try {
+			// TODO analyze the query
+			final SQLiteDatabase database = getWritableDatabase();
+
 			if (JaiberdroidInstance.isDebug()) {
 				Log.d(SQL_TAG, query);
 			}
