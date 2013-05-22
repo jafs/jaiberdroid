@@ -16,6 +16,7 @@
 package es.jafs.jaiberdroid;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -169,15 +170,11 @@ public class Query {
 	 */
 	public static ContentValues getValues(final Query query, final boolean id, final String[] filter)
 										throws JaiberdroidException {
-		List<String> filtered = null;
 		if (null != filter && filter.length > 0) {
-			filtered = new ArrayList<String>();
-			for (String current : filter) {
-				filtered.add(current);
-			}
+			return getValues(query, id, Arrays.asList(filter));
+		} else {
+			return getValues(query, id, (List<String>) null);
 		}
-
-		return getValues(query, id, filtered);
 	}
 
 
