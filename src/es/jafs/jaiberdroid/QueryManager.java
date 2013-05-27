@@ -1,15 +1,32 @@
+/*
+ * Copyright (C) 2013 JAFS.es
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package es.jafs.jaiberdroid;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
-
 
 /**
  * Class that execute and control the querys.
@@ -18,10 +35,8 @@ import android.util.Log;
  * @todo    This class must receive only one query method, and analyzes whats method call.
  */
 final class QueryManager extends SQLiteOpenHelper {
-	/** Database version. */
-	private static int version = 0;
-	/** Database name. */
-	private static String name = "";
+	/** Log tag for SQL queries. */
+	private static final String SQL_TAG = "sqlop";
 
 	/** Instance of Entity Manager. */
 	private EntityManager entityManager;
@@ -29,9 +44,14 @@ final class QueryManager extends SQLiteOpenHelper {
 
 	/**
 	 * Default constructor of the class.
+	 * @param  context        Application context.
+	 * @param  entityManager  Entity manager for persistence.
+	 * @param  version        Database version.
+	 * @param  name           Name of database.
 	 * @throws JaiberdroidException 
 	 */
-	public QueryManager(final Context context, final EntityManager entityManager) throws JaiberdroidException {
+	QueryManager(final Context context, final EntityManager entityManager, final int version,
+				final String name) throws JaiberdroidException {
 		super(context, name, null, version);
 		this.entityManager = entityManager;
 	}
@@ -43,7 +63,7 @@ final class QueryManager extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onCreate(final SQLiteDatabase database) {
-		if (!executeUpdates(entityManager.getCreateQueries(), true, database)) {
+		if (!executeUpdates(entityManager.getCreateQueries(), false, database)) {
 			Log.e(JaiberdroidInstance.LOG_TAG, "Problem creating database.");
 		}
 	}
@@ -68,12 +88,65 @@ final class QueryManager extends SQLiteOpenHelper {
 
 
 	/**
+	 * Executes a query and return its result.
+	 * @param  query  Query to execute.
+	 * @return Object with result of query.
+	 * @throws JaiberdroidException When there is an error on query.
+	 */
+	Object executeQuery(final Query query) throws JaiberdroidException {
+		if (Query.Type.SELECT.equals(query.getType())) {
+			return executeEntity(query);
+		} else {
+			return executeUpdate(query);
+		}
+	}
+
+
+	/**
+	 * Execute a query in database.
+	 * @param  query  String with query to execute.
+	 * @return Object with results. A List of Map of Strings, where key is field name and
+	 *         value is content of field in String format.
+	 */
+	Object executeQuery(final String query) {
+		List<Map<String, String>> result = null;
+
+		try {
+			// TODO analyze the query (can be an update).
+			final SQLiteDatabase database = getWritableDatabase();
+			result = new ArrayList<Map<String,String>>();
+
+			if (JaiberdroidInstance.isDebug()) {
+				Log.d(SQL_TAG, query);
+			}
+			final Cursor cursor = database.rawQuery(query, null);
+			if (cursor.moveToFirst()) {
+				Map<String, String> row;
+
+				do {
+					row = new HashMap<String, String>();
+					for (int i = 0; i < cursor.getColumnCount(); ++i) {
+						row.put(cursor.getColumnName(i), cursor.getString(i));
+					}
+					result.add(row);
+				} while (cursor.moveToNext());
+			}
+			cursor.close();
+		} catch (final SQLException e) {
+			Log.e(JaiberdroidInstance.LOG_TAG, "Executing sql: " + e.getMessage(), e);
+		}
+
+		return result;
+	}
+
+
+	/**
 	 * Executes an update with received query.
 	 * @param  query  Query to execute.
 	 * @return Number of rows affected. -1 if there an error.
-	 * @throws JaiberdroidException 
+	 * @throws JaiberdroidException When there is an error on query.
 	 */
-	public long executeUpdate(final Query query) throws JaiberdroidException {
+	private long executeUpdate(final Query query) throws JaiberdroidException {
 		long rows = -1;
 
 		try {
@@ -82,6 +155,8 @@ final class QueryManager extends SQLiteOpenHelper {
 			if (query.isTransactional()) {
 				database.beginTransaction();
 			}
+
+			debugQuery(query);
 
 			switch (query.getType()) {
 				// Inserts a value into the database.
@@ -103,12 +178,12 @@ final class QueryManager extends SQLiteOpenHelper {
 
 				// Delete values of database.
 				case DELETE:
-					database.delete(query.getEntity().getTableName(), query.getCondition(),
-									query.getArgsArray());
+					rows = database.delete(query.getEntity().getTableName(), query.getCondition(),
+										query.getArgsArray());
 					break;
 
 				default:
-					Log.d(JaiberdroidInstance.LOG_TAG, "Only Insert, Update, Delete are supported");
+					Log.e(JaiberdroidInstance.LOG_TAG, "Only Insert, Update, Delete are supported");
 			}
 
 			if (database.inTransaction()) {
@@ -128,66 +203,12 @@ final class QueryManager extends SQLiteOpenHelper {
 
 
 	/**
-	 * Execute a query in database.
-	 * @param  query        String with query to execute.
-	 * @param  transaction  Boolean value that sets if the queries are executed in transacction.
-	 * @param  database     Database into execute queries.
-	 * @return Boolean value that indicates if all it's ok.
-	 */
-	public void executeUpdate(final String query, final SQLiteDatabase database) throws SQLException {
-		database.execSQL(query);
-	}
-
-
-	/**
-	 * Execute a list of queries in database.
-	 * @param  database     Database into execute queries.
-	 * @param  queries      List of String with queries to execute.
-	 * @param  transaction  Boolean value that sets if the queries are executed in transacction. 
-	 */
-	private boolean executeUpdates(final List<String> queries, final boolean transaction,
-									final SQLiteDatabase database) {
-		boolean ok = false;
-
-		if (null != queries) {
-			try {
-				if (transaction) {
-					database.beginTransaction();
-				}
-	
-				try {
-					for (String query : queries) {
-						executeUpdate(query, database);
-					}
-	
-					if (database.inTransaction()) {
-						database.setTransactionSuccessful();
-					}
-				} catch (final SQLException e) {
-					Log.e(JaiberdroidInstance.LOG_TAG, "When executing SQL: " + e.getMessage(), e);
-				}
-	
-				if (database.inTransaction()) {
-					database.endTransaction();
-				}
-
-				ok = true;
-			} catch (final SQLException e) {
-				Log.e(JaiberdroidInstance.LOG_TAG, "Opening database: " + e.getMessage(), e);
-			}
-		}
-
-		return ok;
-	}
-
-
-	/**
 	 * Executes a query that returns data of an entity.
 	 * @param  query  Query to execute.
 	 * @return List of results or null is there an error.
-	 * @throws JaiberdroidException 
+	 * @throws JaiberdroidException When there is an error on query.
 	 */
-	public List<Object> executeQueryEntity(final Query query) throws JaiberdroidException {
+	private List<Object> executeEntity(final Query query) throws JaiberdroidException {
 		List<Object> results = null;
 
 		// Checks if query is SELECT type.
@@ -217,12 +238,102 @@ final class QueryManager extends SQLiteOpenHelper {
 
 
 	/**
+	 * Prints a debug trace for a query.
+	 * @param  query  Query to print in debug.
+	 */
+	private static void debugQuery(final Query query) {
+		if (JaiberdroidInstance.isDebug() && null != query) {
+			final StringBuilder message = new StringBuilder();
+
+			message.append(query.getType().name());
+			message.append(" over ");
+			message.append(query.getEntity().getTableName());
+			message.append(" |");
+			if (null != query.getValues() && query.getValues().size() > 0) {
+				message.append(" values [");
+				message.append(query.getValues());
+				message.append("]");
+			}
+			if (!TextUtils.isEmpty(query.getCondition())) {
+				message.append(" condition [");
+				message.append(query.getCondition());
+				message.append("]");
+			}
+			if (null != query.getArgs()) {
+				message.append(" variables [ ");
+				for (int i = 0; i < query.getArgs().size(); ++i) {
+					message.append(query.getArgsArray());
+					message.append(" ");
+				}
+				message.append("]");
+			}
+
+			Log.d(SQL_TAG, message.toString());
+		}
+	}
+
+
+	/**
+	 * Execute a list of queries in database.
+	 * @param  database     Database into execute queries.
+	 * @param  queries      List of String with queries to execute.
+	 * @param  transaction  Boolean value that sets if the queries are executed in transacction. 
+	 */
+	private boolean executeUpdates(final List<String> queries, final boolean transaction,
+									final SQLiteDatabase database) {
+		boolean ok = false;
+
+		if (null != queries) {
+			try {
+				if (transaction) {
+					if (JaiberdroidInstance.isDebug()) {
+						Log.d(SQL_TAG, "BEGIN");
+					}
+					database.beginTransaction();
+				}
+	
+				try {
+					for (String query : queries) {
+						if (JaiberdroidInstance.isDebug()) {
+							Log.d(SQL_TAG, query);
+						}
+						database.execSQL(query);
+					}
+	
+					if (transaction && database.inTransaction()) {
+						if (JaiberdroidInstance.isDebug()) {
+							Log.d(SQL_TAG, "COMMIT");
+						}
+						database.setTransactionSuccessful();
+					}
+				} catch (final SQLException e) {
+					Log.e(JaiberdroidInstance.LOG_TAG, "When executing SQL: " + e.getMessage(), e);
+				}
+	
+				if (transaction && database.inTransaction()) {
+					if (JaiberdroidInstance.isDebug()) {
+						Log.d(SQL_TAG, "END");
+					}
+					database.endTransaction();
+				}
+
+				ok = true;
+			} catch (final SQLException e) {
+				Log.e(JaiberdroidInstance.LOG_TAG, "Problem in update: " + e.getMessage(), e);
+			}
+		}
+
+		return ok;
+	}
+
+
+	/**
 	 * Executes a query that returns data of an entity.
-	 * @param  query  Query to execute.
+	 * @param  entity  Entity with table to count.
 	 * @return List of results or null is there an error.
 	 * @throws JaiberdroidException 
 	 */
-	public long executeCountQuery(final Entity entity) throws JaiberdroidException {
+	long executeCountQuery(final Entity entity) throws JaiberdroidException {
 		long count = 0;
 
 		try {
@@ -240,6 +351,13 @@ final class QueryManager extends SQLiteOpenHelper {
 	}
 
 
+	/**
+	 * Extracts object data from a cursor and an entity.
+	 * @param  cursor  Cursor with results of a query.
+	 * @param  entity  Entity to extract.
+	 * @return Object of type of entity class.
+	 * @throws JaiberdroidException When a problem occurs.
+	 */
 	@SuppressWarnings("rawtypes")
 	private Object getObject(final Cursor cursor, final Entity entity) throws JaiberdroidException {
 		Object result = null;
@@ -247,10 +365,14 @@ final class QueryManager extends SQLiteOpenHelper {
 		if (null != cursor && cursor.getCount() > 0) {
 			try {
 				result = entity.getReferenced().newInstance();
+				Class type;
+				String name;
+				int pos;
+
 				for (String column : cursor.getColumnNames()) {
-					Class type = entity.getFields().getFieldClass(column);
-					String name = JaiberdroidReflection.getMethodName(JaiberdroidReflection.SET_PREFIX, column);
-					int pos = cursor.getColumnIndex(column);
+					type = entity.getFields().getFieldClass(column);
+					name = JaiberdroidReflection.getMethodSet(column);
+					pos = cursor.getColumnIndex(column);
 
 					if (int.class.equals(type) || Integer.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getInt(pos));
@@ -264,49 +386,13 @@ final class QueryManager extends SQLiteOpenHelper {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getDouble(pos));
 					}
 				}
-			} catch (IllegalAccessException e) {
+			} catch (final IllegalAccessException e) {
 				e.printStackTrace();
-			} catch (InstantiationException e) {
+			} catch (final InstantiationException e) {
 				e.printStackTrace();
 			}
 		}
 
 		return result;
-	}
-
-
-	/**
-	 * Gets the current version of database.
-	 * @return Integer with current version of database.
-	 */
-	public static final int getVersion() {
-		return version;
-	}
-
-
-	/**
-	 * Sets the current version of database.
-	 * @param  version  Integer with current version of database.
-	 */
-	public static final void setVersion(final int version) {
-		QueryManager.version = version;
-	}
-
-
-	/**
-	 * Gets a String with database's name.
-	 * @return String with database's name.
-	 */
-	public static final String getName() {
-		return name;
-	}
-
-
-	/**
-	 * Sets a String with database's name.
-	 * @param  name  String with database's name.
-	 */
-	public static final void setName(String name) {
-		QueryManager.name = name;
 	}
 }

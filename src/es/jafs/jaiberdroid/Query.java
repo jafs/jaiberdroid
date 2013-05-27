@@ -1,17 +1,33 @@
+/*
+ * Copyright (C) 2013 JAFS.es
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package es.jafs.jaiberdroid;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.content.ContentValues;
-import android.util.Log;
+import android.text.TextUtils;
 
 /**
  * Class that implements an SQLite query.
  * @author  Jose Antonio Fuentes Santiago
  * @version 0.5
  */
-public final class Query {
+public class Query {
 	/**
 	 * Types of queries.
 	 * @author  Jose Antonio Fuentes Santiago
@@ -30,20 +46,27 @@ public final class Query {
 
 
 	/** List of arguments in condition. */
-	private final List<String> args = new ArrayList<String>();
+	protected final List<String> args = new ArrayList<String>();
 
 	/** Table name for the query. */
-	private Entity entity;
+	protected Entity entity;
 	/** Values to insert or update. */
-	private ContentValues values;
+	protected ContentValues values;
 	/** Condition that must comply the query. */
-	private String condition;
+	protected String condition;
 	/** Sets if the query is transaccional. The query is executed between a transaction. */
-	private boolean transactional;
+	protected boolean transactional;
 	/** Type of query. */
-	private Type type;
+	protected Type type;
 	/** Object with data of entity. */
-	private Object object;
+	protected Object object;
+
+
+	/**
+	 * Private constructor for inheritance.
+	 */
+	protected Query() {
+	}
 
 
 	/**
@@ -53,12 +76,7 @@ public final class Query {
 	 */
 	@SuppressWarnings("rawtypes")
 	public Query(final Type type, final Class classType) {
-		try {
-			this.entity = JaiberdroidInstance.getEntity(classType);
-		} catch (final JaiberdroidException e) {
-			Log.e(JaiberdroidInstance.LOG_TAG, e.getMessage(), e);
-		}
-
+		this.entity = JaiberdroidInstance.getEntityManager().getEntity(classType);
 		this.type = type;
 	}
 
@@ -69,12 +87,7 @@ public final class Query {
 	 * @param object  Object that contains data of query.
 	 */
 	public Query(final Type type, final Object object) {
-		try {
-			this.entity = JaiberdroidInstance.getEntity(object.getClass());
-		} catch (final JaiberdroidException e) {
-			Log.e(JaiberdroidInstance.LOG_TAG, e.getMessage(), e);
-		}
-
+		this.entity = JaiberdroidInstance.getEntityManager().getEntity(object.getClass());
 		this.type = type;
 		this.object = object;
 	}
@@ -82,12 +95,11 @@ public final class Query {
 
 	/**
 	 * Creates an insert query.
-	 * @param  entity  Entity class to execute.
 	 * @param  object  Object with data to insert.
 	 * @return Query   Query generated.
 	 * @throws JaiberdroidException 
 	 */
-	static Query createInsert(final Object object) throws JaiberdroidException {
+	public static Query createInsert(final Object object) throws JaiberdroidException {
 		final Query query = new Query(Type.INSERT, object);
 
 		query.setTransactional(true);
@@ -99,12 +111,11 @@ public final class Query {
 
 	/**
 	 * Creates an update query.
-	 * @param  entity  Entity class to execute.
 	 * @param  object  Object with data to update.
 	 * @return Query   Query generated.
 	 * @throws JaiberdroidException 
 	 */
-	static Query createUpdate(final Object object) throws JaiberdroidException {
+	public static Query createUpdate(final Object object) throws JaiberdroidException {
 		final Query query = new Query(Type.UPDATE, object);
 
 		query.addArg(JaiberdroidReflection.executeGetMethod(JaiberdroidReflection.GET_ID, object));
@@ -118,13 +129,13 @@ public final class Query {
 
 	/**
 	 * Creates a delete query.
-	 * @param  object  Object with data to delete.
-	 * @param  id      Id of elemento to delete. If id is -1, get the remove all query.
-	 * @return Query   Query generated.
+	 * @param  type  Type of entity.
+	 * @param  id    Id of elemento to delete. If id is -1, get the remove all query.
+	 * @return Query generated.
 	 * @throws JaiberdroidException 
 	 */
 	@SuppressWarnings("rawtypes")
-	static Query createDelete(final Class type, final int id) throws JaiberdroidException {
+	public static Query createDelete(final Class type, final int id) throws JaiberdroidException {
 		final Query query = new Query(Type.DELETE, type);
 
 		if (-1 != id) {
@@ -159,15 +170,11 @@ public final class Query {
 	 */
 	public static ContentValues getValues(final Query query, final boolean id, final String[] filter)
 										throws JaiberdroidException {
-		List<String> filtered = null;
 		if (null != filter && filter.length > 0) {
-			filtered = new ArrayList<String>();
-			for (String current : filter) {
-				filtered.add(current);
-			}
+			return getValues(query, id, Arrays.asList(filter));
+		} else {
+			return getValues(query, id, (List<String>) null);
 		}
-
-		return getValues(query, id, filtered);
 	}
 
 
@@ -179,7 +186,7 @@ public final class Query {
 	 * @return ContentValues object with generated data.
 	 * @throws JaiberdroidException 
 	 */
-	private static ContentValues getValues(final Query query, final boolean id, final List<String> filter) throws JaiberdroidException {
+	protected static ContentValues getValues(final Query query, final boolean id, final List<String> filter) throws JaiberdroidException {
 		final ContentValues values = new ContentValues();
 		final Object object = query.getObject();
 		String name;
@@ -192,12 +199,14 @@ public final class Query {
 				if ((id || !JaiberdroidSql._ID.equals(field.getName()))
 						&& (null == filter || !filter.contains(field.getName()))) {
 					// Executes the method to obtain the value.
-					name = JaiberdroidReflection.getMethodName(JaiberdroidReflection.GET_PREFIX, field.getName());
+					name = JaiberdroidReflection.getMethodGet(field.getName());
 					data = JaiberdroidReflection.executeGetMethod(name, object);
 
 					// Checks if the value is ok.
 					if (data == null) {
-						if (field.isNull()) {
+						if (!TextUtils.isEmpty(field.getDefaultValue())) {
+							values.put(field.getName(), field.getDefaultValue());
+						} else if (field.isNull()) {
 							values.putNull(field.getName());
 						} else {
 							throw new JaiberdroidException("Field " + field.getName() + " in table "
@@ -476,6 +485,21 @@ public final class Query {
 	 */
 	public final void setObject(final Object object) {
 		this.object = object;
+	}
+
+
+	/**
+	 * Gets the id of current object if exists.
+	 * @return Integer with id of current object. 0 if the object hasn't id.
+	 */
+	public final int getId() {
+		int id = 0;
+
+		if (null != values && values.containsKey(JaiberdroidSql._ID)) {
+			id = values.getAsInteger(JaiberdroidSql._ID);
+		}
+
+		return id;
 	}
 
 

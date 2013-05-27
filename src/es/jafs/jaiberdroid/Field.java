@@ -1,9 +1,19 @@
+/*
+ * Copyright (C) 2013 JAFS.es
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package es.jafs.jaiberdroid;
-
-
-
-
-
 
 /**
  * Class that represents a field of a table.<br />
@@ -14,7 +24,7 @@ package es.jafs.jaiberdroid;
  * @version 0.5
  */
 @SuppressWarnings("rawtypes")
-class Field {
+final class Field {
 	/** Name of the field. */
 	private String name = "";
 	/** Field's data type. */
@@ -25,6 +35,12 @@ class Field {
 	private boolean unique = false;
 	/** The field is null. */
 	private boolean isnull = true;
+	/** The field has default value. */
+	private String defaultValue = null;
+	/** The current field must be indexed. */
+	private boolean index = false;
+	/** Ascendent order when current column is indexed. */
+	private boolean ascOrder = true;
 	/** Class of field. */
 	private Class fieldClass = null;
 
@@ -34,7 +50,7 @@ class Field {
 	 * @param  name        Name of the field.
 	 * @param  fieldClass  Class type of the field
 	 */
-	public Field(final String name, final Class fieldClass) {
+	Field(final String name, final Class fieldClass) {
 		this.name = name;
 		this.type = FieldTypes.INTEGER;
 		this.primary = true;
@@ -45,12 +61,12 @@ class Field {
 
 
 	/**
-	 * Default constructor with only two params.
+	 * Default constructor with three params.
 	 * @param  name  Name of the field.
 	 * @param  type  Field's data type.
 	 * @param  fieldClass  Class type of the field
 	 */
-	public Field(final String name, final FieldTypes type, final Class fieldClass) {
+	Field(final String name, final FieldTypes type, final Class fieldClass) {
 		this.name = name;
 		this.fieldClass = fieldClass;
 
@@ -65,11 +81,10 @@ class Field {
 	 * @param  name     Name of the field.
 	 * @param  type     Field's data type.
 	 * @param  isnull   Field is null or not.
-	 * @param  auto     The field is auto numeric.
 	 * @param  unique   The field has unique constraint.
 	 * @param  fieldClass  Class type of the field
 	 */
-	public Field(final String name, final FieldTypes type, final boolean isnull, final boolean unique, final Class fieldClass) {
+	Field(final String name, final FieldTypes type, final boolean isnull, final boolean unique, final Class fieldClass) {
 		this.name = name;
 		this.unique = unique;
 		this.isnull = isnull;
@@ -85,7 +100,7 @@ class Field {
 	 * Gets the name of the field.
 	 * @return String with the name of the field.
 	 */
-	public final String getName() {
+	final String getName() {
 		return name;
 	}
 
@@ -94,7 +109,7 @@ class Field {
 	 * Gets the type of the field.
 	 * @return Enumeration with the type of the field.
 	 */
-	public final FieldTypes getType() {
+	final FieldTypes getType() {
 		return type;
 	}
 
@@ -103,7 +118,7 @@ class Field {
 	 * Gets if the field is primary key.
 	 * @return Boolean that is true if field is primary key.
 	 */
-	public final boolean isPrimary() {
+	final boolean isPrimary() {
 		return primary;
 	}
 
@@ -112,7 +127,7 @@ class Field {
 	 * Gets if the field is unique.
 	 * @return Boolean that is true if field is unique.
 	 */
-	public final boolean isUnique() {
+	final boolean isUnique() {
 		return unique;
 	}
 
@@ -121,7 +136,7 @@ class Field {
 	 * Gets if the field is null.
 	 * @return Boolean that is true if field is null.
 	 */
-	public final boolean isNull() {
+	final boolean isNull() {
 		return isnull;
 	}
 
@@ -130,7 +145,7 @@ class Field {
 	 * Gets the class of the field.
 	 * @return Class of the field.
 	 */
-	public final Class getFieldClass() {
+	final Class getFieldClass() {
 		return fieldClass;
 	}
 
@@ -139,8 +154,62 @@ class Field {
 	 * Sets the class of the field.
 	 * @param  fieldClass  Class of the field.
 	 */
-	public final void setFieldClass(final Class fieldClass) {
+	final void setFieldClass(final Class fieldClass) {
 		this.fieldClass = fieldClass;
+	}
+
+
+	/**
+	 * Gets a string with default value of field.
+	 * @return String with default value of field.
+	 */
+	final String getDefaultValue() {
+		return defaultValue;
+	}
+
+
+	/**
+	 * Sets a string with default value of field.
+	 * @param  defaultValue  String with default value of field.
+	 */
+	final void setDefaultValue(final String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+
+	/**
+	 * Gets a boolean value that indicates if current field must be indexed.
+	 * @return Boolean value that indicates if current field must be indexed.
+	 */
+	final boolean isIndex() {
+		return index;
+	}
+
+
+	/**
+	 * Sets a boolean value that indicates if current field must be indexed.
+	 * @param  index  Boolean value that indicates if current field must be indexed.
+	 */
+	final void setIndex(final boolean index) {
+		this.index = index;
+	}
+
+
+	/**
+	 * Gets a boolean value that indicates if index must be ordered ascending.
+	 * @return Boolean value that indicates if index must be ordered ascending.
+	 */
+	final boolean isAscOrder() {
+		return ascOrder;
+	}
+
+
+	/**
+	 * Sets a boolean value that indicates if index must be ordered ascending.
+	 * @param ascOrder Boolean value that indicates if index must be ordered ascending.
+	 */
+	final void setAscOrder(final boolean ascOrder) {
+		this.ascOrder = ascOrder;
 	}
 
 
@@ -163,6 +232,8 @@ class Field {
 		objSql.append(isnull);
 		objSql.append("; unique->");
 		objSql.append(unique);
+		objSql.append("; default->");
+		objSql.append(defaultValue);
 		objSql.append('}');
 
 		return objSql.toString();
