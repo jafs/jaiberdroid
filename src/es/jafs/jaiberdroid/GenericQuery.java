@@ -1,9 +1,23 @@
+/*
+ * Copyright (C) 2013 JAFS.es
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package es.jafs.jaiberdroid;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-import android.util.Log;
 import es.jafs.jaiberdroid.Query.Type;
 
 /**
@@ -26,19 +40,17 @@ public class GenericQuery<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public GenericQuery() {
-		try {
-			final Class<T> type = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-			entity = JaiberdroidInstance.getInstance().getEntityManager().getEntity(type);
+		final Class<T> type = (Class<T>) ((ParameterizedType)getClass().getGenericSuperclass())
+																				.getActualTypeArguments()[0];
 
-			if (null == queryManager) {
-				queryManager = JaiberdroidInstance.getInstance().getQueryManager();
-			}
-			if (null == entityManager) {
-				entityManager = JaiberdroidInstance.getInstance().getEntityManager();
-			}
-		} catch (final IllegalAccessException e) {
-			Log.e(JaiberdroidInstance.LOG_TAG, e.getMessage());
+		if (null == entityManager) {
+			entityManager = JaiberdroidInstance.getEntityManager();
 		}
+		if (null == queryManager) {
+			queryManager = JaiberdroidInstance.getQueryManager();
+		}
+
+		entity = entityManager.getEntity(type);
 	}
 
 
@@ -49,7 +61,7 @@ public class GenericQuery<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<T> getAll() throws JaiberdroidException {
-		return (List<T>) queryManager.executeQueryEntity(new Query(Type.SELECT, entity.getReferenced()));
+		return (List<T>) queryManager.executeQuery(new Query(Type.SELECT, entity.getReferenced()));
 	}
 
 
@@ -67,7 +79,7 @@ public class GenericQuery<T> {
 		query.addArg(id);
 		query.setCondition(JaiberdroidSql._ID + " = ?");
 
-		final List<T> resul = (List<T>) queryManager.executeQueryEntity(query);
+		final List<T> resul = (List<T>) queryManager.executeQuery(query);
 		if (null != resul && !resul.isEmpty()) {
 			current = resul.get(0);
 		}
@@ -83,29 +95,29 @@ public class GenericQuery<T> {
 	 * @throws JaiberdroidException 
 	 */
 	public boolean insert(final T object) throws JaiberdroidException {
-		return (-1L != queryManager.executeUpdate(Query.createInsert(object)));
+		return (-1L != (Long) queryManager.executeQuery(Query.createInsert(object)));
 	}
 
 
 	/**
 	 * Update the received object.
 	 * @param  object  Object to update.
-	 * @return Number of rows affected.
+	 * @return Boolean value that is true if entity has been updated.
 	 * @throws JaiberdroidException 
 	 */
-	public long update(final T object) throws JaiberdroidException {
-		return queryManager.executeUpdate(Query.createUpdate(object));
+	public boolean update(final T object) throws JaiberdroidException {
+		return (1L == (Long) queryManager.executeQuery(Query.createUpdate(object)));
 	}
 
 
 	/**
 	 * Delete an object with its id.
 	 * @param  id  Id of the object to delete.
-	 * @return Number of rows affected.
+	 * @return Boolean value that is true if the row has been deleted.
 	 * @throws JaiberdroidException 
 	 */
-	public long remove(final int id) throws JaiberdroidException {
-		return queryManager.executeUpdate(Query.createDelete(entity.getReferenced(), id));
+	public boolean remove(final int id) throws JaiberdroidException {
+		return (1L == (Long) queryManager.executeQuery(Query.createDelete(entity.getReferenced(), id)));
 	}
 
 
@@ -115,7 +127,7 @@ public class GenericQuery<T> {
 	 * @throws JaiberdroidException 
 	 */
 	public long removeAll() throws JaiberdroidException {
-		return queryManager.executeUpdate(Query.createDelete(entity.getReferenced(), -1));
+		return (Long) queryManager.executeQuery(Query.createDelete(entity.getReferenced(), -1));
 	}
 
 
@@ -137,5 +149,26 @@ public class GenericQuery<T> {
 	 */
 	public long count() throws JaiberdroidException {
 		return queryManager.executeCountQuery(entity);
+	}
+
+
+	/**
+	 * Executes a generic SQL query.
+	 * @param  sql  SQL query to execute.
+	 * @return An object with the result.
+	 */
+	protected Object executeQuery(final String sql) {
+		return queryManager.executeQuery(sql);
+	}
+
+
+	/**
+	 * Executes a query and return its result.
+	 * @param  query  Query to execute.
+	 * @return Object with result of query.
+	 * @throws JaiberdroidException When there is an error on query.
+	 */
+	protected Object executeQuery(final Query query) throws JaiberdroidException {
+		return queryManager.executeQuery(query);
 	}
 }

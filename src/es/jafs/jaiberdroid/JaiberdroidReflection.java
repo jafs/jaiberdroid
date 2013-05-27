@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2013 JAFS.es
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package es.jafs.jaiberdroid;
 
 import java.lang.annotation.Annotation;
@@ -15,13 +30,21 @@ import es.jafs.jaiberdroid.annotations.Table;
  */
 public class JaiberdroidReflection {
 	/** Prefix of SET type methods. */
-	public static final String SET_PREFIX = "set";
+	private static final String SET_PREFIX = "set";
 	/** Prefix of GET type methods. */
-	public static final String GET_PREFIX = "get";
+	private static final String GET_PREFIX = "get";
+
 	/** Name of get id method. */
 	public static final String GET_ID = GET_PREFIX + JaiberdroidSql._ID;
 	/** Name of set id method. */
 	public static final String SET_ID = SET_PREFIX + JaiberdroidSql._ID;
+
+
+	/**
+	 * Private constructor for avoid external instances.
+	 */
+	private JaiberdroidReflection() {
+	}
 
 
 	/**
@@ -32,7 +55,13 @@ public class JaiberdroidReflection {
 	 * @throws JaiberdroidException 
 	 */
 	public static String executeGetMethod(final String name, final Object object) throws JaiberdroidException {
-		return execute(name, object, null, null, true).toString();
+		final Object result = execute(name, object, null, null, true);
+
+		if (null == result) {
+			return null;
+		} else {
+			return result.toString();
+		}
 	}
 
 
@@ -110,7 +139,7 @@ public class JaiberdroidReflection {
 
 	/**
 	 * Loads the columns of database in the object.
-	 * @param  entity  Entity to analize.
+	 * @param  type  Class of entity to analize.
 	 */
 	@SuppressWarnings("rawtypes")
 	private static Entity loadTable(final Class type) {
@@ -170,20 +199,19 @@ public class JaiberdroidReflection {
 	 */
 	private static Field getColumn(final java.lang.reflect.Field attribute, final Column annotation)
 								throws JaiberdroidException {
-		FieldTypes type = FieldTypes.NULL;
-		String name = null;
-		String typeName = attribute.getType().getName();
-
-		// Load the name.
-		name = attribute.getName();
+		final String name = attribute.getName();
+		final String typeName = attribute.getType().getName();
+		Field field = null;
 
 		if (annotation.primary()) {
 			if (int.class.getName().equals(typeName)) {
-				return new Field(name, int.class);
+				field = new Field(name, int.class);
 			} else {
 				throw new JaiberdroidException("Primary key must be of int type");
 			}
 		} else {
+			FieldTypes type = FieldTypes.NULL;
+
 			// Load the attribute type.
 			if (String.class.getName().equals(typeName)) {
 				type = FieldTypes.TEXT;
@@ -197,13 +225,39 @@ public class JaiberdroidReflection {
 				throw new JaiberdroidException("Invalid data type: " + attribute.getType().getName());
 			}
 
-			// Check if the attribute is null and is primitive type.
+			// If attribute is null and primitive type, but no has annotation launch an exception.
 			if (annotation.nullable() && isPrimitive(attribute.getType())) {
-				throw new JaiberdroidException("Primitive fields must be not null: " + attribute.getName());
+				final StringBuilder error = new StringBuilder();
+				error.append("In field ");
+				error.append(attribute.getName());
+				error.append(". Primitive fields can be nullables.");
+				throw new JaiberdroidException(error.toString());
 			}
 
-			return new Field(name, type, annotation.nullable(), annotation.unique(), attribute.getType());
+			field = new Field(name, type, annotation.nullable(), annotation.unique(), attribute.getType());
+
+			// Cheks the default value if exists.
+			try {
+				if (!TextUtils.isEmpty(annotation.defaultValue())) {
+					if (type.equals(FieldTypes.INTEGER)) {
+						Integer.parseInt(annotation.defaultValue());
+					} else if (type.equals(FieldTypes.REAL)) {
+						Double.parseDouble(annotation.defaultValue());
+					}
+				}
+
+				field.setDefaultValue(annotation.defaultValue());
+			} catch (final NumberFormatException e) {
+				throw new JaiberdroidException("Invalid default value for numeric field: "
+											+ attribute.getName());
+			}
+
+			// Configure the index value.
+			field.setIndex(annotation.index());
+			field.setAscOrder(annotation.ascOrder());
 		}
+
+		return field;
 	}
 
 
@@ -239,5 +293,25 @@ public class JaiberdroidReflection {
 		methodName.append(name.substring(1));
 
 		return methodName.toString();
+	}
+
+
+	/**
+	 * Gets the name of a method por get parameter received.
+	 * @param  name  Name of parameter to get.
+	 * @return Name of the method generated.
+	 */
+	public static String getMethodGet(final String name) {
+		return getMethodName(GET_PREFIX, name);
+	}
+
+
+	/**
+	 * Gets the name of a method por set parameter received.
+	 * @param  name  Name of parameter to set.
+	 * @return Name of the method generated.
+	 */
+	public static String getMethodSet(final String name) {
+		return getMethodName(SET_PREFIX, name);
 	}
 }

@@ -1,9 +1,23 @@
+/*
+ * Copyright (C) 2013 JAFS.es
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package es.jafs.jaiberdroid;
 
+import java.util.Map;
+
 import es.jafs.jaiberdroid.utils.ToString;
-
-
-
 
 /**
  * Interface that represents a Table interface.
@@ -26,7 +40,7 @@ final class Entity extends ToString {
 	 * Gets a boolean value that indicates if table is loaded.
 	 * @return Boolean value that indicates if table is loaded.
 	 */
-	public boolean isLoaded() {
+	boolean isLoaded() {
 		return loaded;
 	}
 
@@ -35,7 +49,7 @@ final class Entity extends ToString {
 	 * Sets a boolean value that indicates if table is loaded.
 	 * @param  loaded  Boolean value that indicates if table is loaded.
 	 */
-	public void setLoaded(final boolean loaded) {
+	void setLoaded(final boolean loaded) {
 		this.loaded = loaded;
 	}
 
@@ -44,7 +58,7 @@ final class Entity extends ToString {
 	 * Gets the name of the table.
 	 * @return String with name of the table.
 	 */
-	public String getTableName() {
+	String getTableName() {
 		return tableName;
 	}
 
@@ -53,7 +67,7 @@ final class Entity extends ToString {
 	 * Sets the name of the table.
 	 * @param  tableName  String with name of the table.
 	 */
-	public void setTableName(final String tableName) {
+	void setTableName(final String tableName) {
 		this.tableName = tableName;
 	}
 
@@ -62,7 +76,7 @@ final class Entity extends ToString {
 	 * Appends a field to field factory.
 	 * @param  field  Data of field to insert.
 	 */
-	public void appendField(final Field field) throws JaiberdroidException {
+	void appendField(final Field field) throws JaiberdroidException {
 		try {
 			fields.append(field);
 		} catch (final JaiberdroidException e) {
@@ -77,28 +91,10 @@ final class Entity extends ToString {
 
 
 	/**
-	 * Deletes a existing field.
-	 * @param  field  Field to detele.
-	 */
-	public void removeField(final Field field) {
-		fields.remove(field);
-	}
-
-
-	/**
-	 * Deletes a existing field.
-	 * @param  name  String with the name of the field.
-	 */
-	public void removeField(final String name) {
-		fields.remove(name);
-	}
-
-
-	/**
 	 * Gets a field factory.
 	 * @return Object with field factory.
 	 */
-	public FieldSet getFields() {
+	FieldSet getFields() {
 		return fields;
 	}
 
@@ -107,8 +103,29 @@ final class Entity extends ToString {
 	 * Returns a value that indicates if current entity has a valid primary key.
 	 * @return Value boolean that indicates if entity has valid primary key.
 	 */
-	public boolean hasKey() {
+	boolean hasKey() {
 		return fields.hasKey();
+	}
+
+
+	/**
+	 * Returns a boolean value that indicates if the entity has index fields.
+	 * @return Boolean value that indicates if the entity has index fields.
+	 */
+	boolean hasIndexes() {
+		final Map<String, Field> fieldsMap = fields.getFields();
+		boolean index = false;
+
+		if (null != fieldsMap) {
+			for (final Field field : fieldsMap.values()) {
+				if (field.isIndex()) {
+					index = true;
+					break;
+				}
+			}
+		}
+
+		return index;
 	}
 
 
@@ -117,7 +134,7 @@ final class Entity extends ToString {
 	 * @return Class linked with this entity.
 	 */
 	@SuppressWarnings("rawtypes")
-	public final Class getReferenced() {
+	Class getReferenced() {
 		return referenced;
 	}
 
@@ -127,7 +144,7 @@ final class Entity extends ToString {
 	 * @param  referenced  Class linked with this entity.
 	 */
 	@SuppressWarnings("rawtypes")
-	public final void setReferenced(final Class referenced) {
+	void setReferenced(final Class referenced) {
 		this.referenced = referenced;
 	}
 }
