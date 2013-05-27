@@ -16,7 +16,9 @@
 package es.jafs.jaiberdroid;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -103,27 +105,28 @@ final class QueryManager extends SQLiteOpenHelper {
 	/**
 	 * Execute a query in database.
 	 * @param  query  String with query to execute.
-	 * @return Object with results. Can be a List of String array or a single object.
+	 * @return Object with results. A List of Map of Strings, where key is field name and
+	 *         value is content of field in String format.
 	 */
 	Object executeQuery(final String query) {
-		List<String[]> result = null;
+		List<Map<String, String>> result = null;
 
 		try {
 			// TODO analyze the query (can be an update).
 			final SQLiteDatabase database = getWritableDatabase();
-			result = new ArrayList<String[]>();
+			result = new ArrayList<Map<String,String>>();
 
 			if (JaiberdroidInstance.isDebug()) {
 				Log.d(SQL_TAG, query);
 			}
 			final Cursor cursor = database.rawQuery(query, null);
 			if (cursor.moveToFirst()) {
-				String[] row;
+				Map<String, String> row;
 
 				do {
-					row = new String[cursor.getColumnCount()];
-					for (int j = 0; j < cursor.getColumnCount(); ++j) {
-						row[j] = cursor.getString(j);
+					row = new HashMap<String, String>();
+					for (int i = 0; i < cursor.getColumnCount(); ++i) {
+						row.put(cursor.getColumnName(i), cursor.getString(i));
 					}
 					result.add(row);
 				} while (cursor.moveToNext());
