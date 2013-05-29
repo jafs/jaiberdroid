@@ -28,5 +28,7 @@ enum FieldTypes {
 	/** The value is a floating point value, stored as an 8-byte IEEE floating point number. */
 	REAL,
 	/** The value is a text string, stored using the database encoding (UTF-8, UTF-16BE or UTF-16LE). */
-	TEXT
+	TEXT,
+	/** The value is a boolean value, values are stored as integer 0 (false) and 1 (true). */
+	BOOLEAN
 }
