@@ -380,9 +380,9 @@ final class QueryManager extends SQLiteOpenHelper {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getLong(pos));
 					} else if (String.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getString(pos));
-					} else if (float.class.getName().equals(type) || Float.class.getName().equals(type)) { 
+					} else if (float.class.equals(type) || Float.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getFloat(pos));
-					} else if (double.class.getName().equals(type) || Double.class.getName().equals(type)) {
+					} else if (double.class.equals(type) || Double.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getDouble(pos));
 					}
 				}
