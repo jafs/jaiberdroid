@@ -198,7 +198,7 @@ public class Query {
 				if ((id || !JaiberdroidSql._ID.equals(field.getName()))
 						&& (null == filter || !filter.contains(field.getName()))) {
 					// Executes the method to obtain the value.
-					name = JaiberdroidReflection.getMethodGet(field.getName());
+					name = JaiberdroidReflection.getMethodGet(field.getName(), field.getType());
 					data = JaiberdroidReflection.executeGetMethod(name, object);
 
 					// Checks if the value is ok.

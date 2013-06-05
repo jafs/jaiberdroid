@@ -384,6 +384,9 @@ final class QueryManager extends SQLiteOpenHelper {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getFloat(pos));
 					} else if (double.class.equals(type) || Double.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getDouble(pos));
+					} else if (boolean.class.equals(type) || Boolean.class.equals(type)) {
+						JaiberdroidReflection.executeSetMethod(name, result, type,
+															"true".equals(cursor.getString(pos)));
 					}
 				}
 			} catch (final IllegalAccessException e) {

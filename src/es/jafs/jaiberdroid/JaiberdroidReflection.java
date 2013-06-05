@@ -33,6 +33,8 @@ public class JaiberdroidReflection {
 	private static final String SET_PREFIX = "set";
 	/** Prefix of GET type methods. */
 	private static final String GET_PREFIX = "get";
+	/** Prefix of IS type methods. */
+	private static final String IS_PREFIX = "is";
 
 	/** Name of get id method. */
 	public static final String GET_ID = GET_PREFIX + JaiberdroidSql._ID;
@@ -301,10 +303,15 @@ public class JaiberdroidReflection {
 	/**
 	 * Gets the name of a method por get parameter received.
 	 * @param  name  Name of parameter to get.
+	 * @param  type  Type of field.
 	 * @return Name of the method generated.
 	 */
-	public static String getMethodGet(final String name) {
-		return getMethodName(GET_PREFIX, name);
+	public static String getMethodGet(final String name, final FieldTypes type) {
+		if (FieldTypes.BOOLEAN.equals(type)) {
+			return getMethodName(IS_PREFIX, name);
+		} else {
+			return getMethodName(GET_PREFIX, name);
+		}
 	}
 
 
