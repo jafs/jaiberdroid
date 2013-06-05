@@ -221,6 +221,8 @@ public class JaiberdroidReflection {
 			} else if (float.class.getName().equals(typeName) || double.class.getName().equals(typeName)
 					|| Float.class.getName().equals(typeName) || Double.class.getName().equals(typeName)) {
 				type = FieldTypes.REAL;
+			} else if (boolean.class.getName().equals(typeName) || Boolean.class.getName().equals(typeName)) {
+				type = FieldTypes.BOOLEAN;
 			} else {
 				throw new JaiberdroidException("Invalid data type: " + attribute.getType().getName());
 			}
