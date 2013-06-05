@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.content.ContentValues;
-import android.text.TextUtils;
 
 /**
  * Class that implements an SQLite query.
@@ -204,9 +203,7 @@ public class Query {
 
 					// Checks if the value is ok.
 					if (data == null) {
-						if (!TextUtils.isEmpty(field.getDefaultValue())) {
-							values.put(field.getName(), field.getDefaultValue());
-						} else if (field.isNull()) {
+						if (field.isNull()) {
 							values.putNull(field.getName());
 						} else {
 							throw new JaiberdroidException("Field " + field.getName() + " in table "
