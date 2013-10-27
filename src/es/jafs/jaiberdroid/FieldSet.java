@@ -27,7 +27,7 @@ import es.jafs.jaiberdroid.utils.ToString;
  * @author  Jose Antonio Fuentes Santiago
  * @version 0.5
  */
-class FieldSet extends ToString implements BaseColumns {
+final class FieldSet extends ToString implements BaseColumns {
 	/** Map with a set of fields. */
 	private final Map<String, Field> fields = new HashMap<String, Field>();
 

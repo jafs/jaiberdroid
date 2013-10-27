@@ -17,6 +17,7 @@ package es.jafs.jaiberdroid;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -26,7 +27,7 @@ import android.content.ContentValues;
  * @author  Jose Antonio Fuentes Santiago
  * @version 0.5
  */
-public class Query {
+public final class Query {
 	/**
 	 * Types of queries.
 	 * @author  Jose Antonio Fuentes Santiago
@@ -185,6 +186,7 @@ public class Query {
 	 * @return ContentValues object with generated data.
 	 * @throws JaiberdroidException 
 	 */
+	@SuppressWarnings("deprecation")
 	protected static ContentValues getValues(final Query query, final boolean id, final List<String> filter) throws JaiberdroidException {
 		final ContentValues values = new ContentValues();
 		final Object object = query.getObject();
@@ -198,11 +200,11 @@ public class Query {
 				if ((id || !JaiberdroidSql._ID.equals(field.getName()))
 						&& (null == filter || !filter.contains(field.getName()))) {
 					// Executes the method to obtain the value.
-					name = JaiberdroidReflection.getMethodGet(field.getName());
+					name = JaiberdroidReflection.getMethodGet(field.getName(), field.getType());
 					data = JaiberdroidReflection.executeGetMethod(name, object);
 
 					// Checks if the value is ok.
-					if (data == null) {
+					if (null == data) {
 						if (field.isNull()) {
 							values.putNull(field.getName());
 						} else {
@@ -210,6 +212,8 @@ public class Query {
 														+ query.getEntity().getTableName()
 														+ " can't be null");
 						}
+					} else if (FieldTypes.DATE.equals(field.getType())) {
+						values.put(field.getName(), Long.toString(Date.parse((String) data) / 1000));
 					} else {
 						values.put(field.getName(), data.toString());
 					}

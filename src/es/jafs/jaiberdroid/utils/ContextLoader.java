@@ -27,7 +27,7 @@ import es.jafs.jaiberdroid.JaiberdroidInstance;
  * @author  Jose Antonio Fuentes Santiago
  * @version 0.5
  */
-public class ContextLoader {
+public final class ContextLoader {
 	/** Name of field that stores Jaiberdroid Entities list. */
 	private static final String CFG_ENTITIES = "jaiberdroid_entities";
 	/** Name of field that stores Jaiberdroid database name. */

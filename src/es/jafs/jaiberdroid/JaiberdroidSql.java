@@ -175,7 +175,7 @@ final class JaiberdroidSql implements BaseColumns {
 		if (null != field && null != field.getName() && !TextUtils.isEmpty(field.getName())) {
 			objSql.append(field.getName());
 			objSql.append(' ');
-			objSql.append(field.getType().name());
+			objSql.append(field.getType().getDataName());
 
 			if (field.isPrimary()) {
 				objSql.append(' ');

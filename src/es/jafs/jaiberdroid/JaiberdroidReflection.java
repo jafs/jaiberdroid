@@ -17,6 +17,7 @@ package es.jafs.jaiberdroid;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.Locale;
 
 import android.text.TextUtils;
@@ -28,11 +29,13 @@ import es.jafs.jaiberdroid.annotations.Table;
  * @author  Jose Antonio Fuentes Santiago
  * @version 0.5
  */
-public class JaiberdroidReflection {
+public final class JaiberdroidReflection {
 	/** Prefix of SET type methods. */
 	private static final String SET_PREFIX = "set";
 	/** Prefix of GET type methods. */
 	private static final String GET_PREFIX = "get";
+	/** Prefix of IS type methods. */
+	private static final String IS_PREFIX = "is";
 
 	/** Name of get id method. */
 	public static final String GET_ID = GET_PREFIX + JaiberdroidSql._ID;
@@ -96,7 +99,9 @@ public class JaiberdroidReflection {
 		try {
 			if (readOnly) { // Methods of type GET.
 				result = object.getClass().getMethod(name, new Class[0]).invoke(object, new Object[0]);
-			} else { // Methods of type SET.
+			} else if (Date.class.equals(type)) { // Methods of type SET. Date are loaded from int values
+				object.getClass().getMethod(name, type).invoke(object, new Date(((Long) value) * 1000));
+			} else {
 				object.getClass().getMethod(name, type).invoke(object, value);
 			}
 		} catch (final IllegalArgumentException e) {
@@ -223,6 +228,8 @@ public class JaiberdroidReflection {
 				type = FieldTypes.REAL;
 			} else if (boolean.class.getName().equals(typeName) || Boolean.class.getName().equals(typeName)) {
 				type = FieldTypes.BOOLEAN;
+			} else if (Date.class.getName().equals(typeName)) {
+				type = FieldTypes.DATE;
 			} else {
 				throw new JaiberdroidException("Invalid data type: " + attribute.getType().getName());
 			}
@@ -275,7 +282,8 @@ public class JaiberdroidReflection {
 		primitive = int.class.getName().equals(type.getName())
 					|| long.class.getName().equals(type.getName())
 					|| double.class.getName().equals(type.getName())
-					|| float.class.getName().equals(type.getName());
+					|| float.class.getName().equals(type.getName())
+					|| boolean.class.getName().equals(type.getName());
 		
 		return primitive;
 	}
@@ -301,10 +309,15 @@ public class JaiberdroidReflection {
 	/**
 	 * Gets the name of a method por get parameter received.
 	 * @param  name  Name of parameter to get.
+	 * @param  type  Type of field.
 	 * @return Name of the method generated.
 	 */
-	public static String getMethodGet(final String name) {
-		return getMethodName(GET_PREFIX, name);
+	public static String getMethodGet(final String name, final FieldTypes type) {
+		if (FieldTypes.BOOLEAN.equals(type)) {
+			return getMethodName(IS_PREFIX, name);
+		} else {
+			return getMethodName(GET_PREFIX, name);
+		}
 	}
 
 

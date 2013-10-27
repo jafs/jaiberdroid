@@ -16,6 +16,7 @@
 package es.jafs.jaiberdroid;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -252,20 +253,20 @@ final class QueryManager extends SQLiteOpenHelper {
 			if (null != query.getValues() && query.getValues().size() > 0) {
 				message.append(" values [");
 				message.append(query.getValues());
-				message.append("]");
+				message.append(']');
 			}
 			if (!TextUtils.isEmpty(query.getCondition())) {
 				message.append(" condition [");
 				message.append(query.getCondition());
-				message.append("]");
+				message.append(']');
 			}
 			if (null != query.getArgs()) {
 				message.append(" variables [ ");
 				for (int i = 0; i < query.getArgs().size(); ++i) {
 					message.append(query.getArgsArray());
-					message.append(" ");
+					message.append(' ');
 				}
-				message.append("]");
+				message.append(']');
 			}
 
 			Log.d(SQL_TAG, message.toString());
@@ -376,14 +377,17 @@ final class QueryManager extends SQLiteOpenHelper {
 
 					if (int.class.equals(type) || Integer.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getInt(pos));
-					} else if (long.class.equals(type) || Long.class.equals(type)) {
+					} else if (long.class.equals(type) || Long.class.equals(type) || Date.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getLong(pos));
 					} else if (String.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getString(pos));
-					} else if (float.class.getName().equals(type) || Float.class.getName().equals(type)) { 
+					} else if (float.class.equals(type) || Float.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getFloat(pos));
-					} else if (double.class.getName().equals(type) || Double.class.getName().equals(type)) {
+					} else if (double.class.equals(type) || Double.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getDouble(pos));
+					} else if (boolean.class.equals(type) || Boolean.class.equals(type)) {
+						JaiberdroidReflection.executeSetMethod(name, result, type,
+															"true".equals(cursor.getString(pos)));
 					}
 				}
 			} catch (final IllegalAccessException e) {
