@@ -21,7 +21,7 @@ import android.util.Log;
 import es.jafs.jaiberdroid.utils.ContextLoader;
 
 /**
- * @mainpage Jaiberdroid 0.5 beta
+ * @mainpage Jaiberdroid 0.5
  * <p>Jaiberdroid is an Object-relational mapping (ORM) library for Android apps that uses SQLite. This allows
  * that with only a few lines of code, we have a complete funcionality for working with databases.</p>
  * <h2>Adding Jaiberdroid to your project</h2>
