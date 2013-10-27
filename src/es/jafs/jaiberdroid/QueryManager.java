@@ -253,20 +253,20 @@ final class QueryManager extends SQLiteOpenHelper {
 			if (null != query.getValues() && query.getValues().size() > 0) {
 				message.append(" values [");
 				message.append(query.getValues());
-				message.append("]");
+				message.append(']');
 			}
 			if (!TextUtils.isEmpty(query.getCondition())) {
 				message.append(" condition [");
 				message.append(query.getCondition());
-				message.append("]");
+				message.append(']');
 			}
 			if (null != query.getArgs()) {
 				message.append(" variables [ ");
 				for (int i = 0; i < query.getArgs().size(); ++i) {
 					message.append(query.getArgsArray());
-					message.append(" ");
+					message.append(' ');
 				}
-				message.append("]");
+				message.append(']');
 			}
 
 			Log.d(SQL_TAG, message.toString());

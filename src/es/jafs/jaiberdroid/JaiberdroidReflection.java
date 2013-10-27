@@ -29,7 +29,7 @@ import es.jafs.jaiberdroid.annotations.Table;
  * @author  Jose Antonio Fuentes Santiago
  * @version 0.5
  */
-public class JaiberdroidReflection {
+public final class JaiberdroidReflection {
 	/** Prefix of SET type methods. */
 	private static final String SET_PREFIX = "set";
 	/** Prefix of GET type methods. */

@@ -27,7 +27,7 @@ import android.content.ContentValues;
  * @author  Jose Antonio Fuentes Santiago
  * @version 0.5
  */
-public class Query {
+public final class Query {
 	/**
 	 * Types of queries.
 	 * @author  Jose Antonio Fuentes Santiago
@@ -186,6 +186,7 @@ public class Query {
 	 * @return ContentValues object with generated data.
 	 * @throws JaiberdroidException 
 	 */
+	@SuppressWarnings("deprecation")
 	protected static ContentValues getValues(final Query query, final boolean id, final List<String> filter) throws JaiberdroidException {
 		final ContentValues values = new ContentValues();
 		final Object object = query.getObject();
@@ -203,7 +204,7 @@ public class Query {
 					data = JaiberdroidReflection.executeGetMethod(name, object);
 
 					// Checks if the value is ok.
-					if (data == null) {
+					if (null == data) {
 						if (field.isNull()) {
 							values.putNull(field.getName());
 						} else {
