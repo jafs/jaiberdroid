@@ -22,13 +22,39 @@ package es.jafs.jaiberdroid;
  */
 enum FieldTypes {
 	/** The value is a NULL value. */
-	NULL,
+	NULL("NULL"),
 	/** The value is a signed integer, stored in 1-8 bytes depending on the magnitude of the value. */
-	INTEGER,
+	INTEGER("INTEGER"),
 	/** The value is a floating point value, stored as an 8-byte IEEE floating point number. */
-	REAL,
+	REAL("REAL"),
 	/** The value is a text string, stored using the database encoding (UTF-8, UTF-16BE or UTF-16LE). */
-	TEXT,
+	TEXT("TEXT"),
 	/** The value is a boolean value, values are stored as integer 0 (false) and 1 (true). */
-	BOOLEAN
+	BOOLEAN("BOOLEAN"),
+	/**
+	 * The value is a date, stored using an integer in databases as Unix Time, with number of seconds since
+	 * 1970-01-01 00:00:00 UTC.
+	 */
+	DATE("INTEGER");
+
+	/** Name of type of data used. */
+	private String dataName;
+
+
+	/**
+	 * Private constructor for avoid external instances.
+	 * @param  dataName  Name of type of data used.
+	 */
+	private FieldTypes(final String dataName) {
+		this.dataName = dataName;
+	}
+
+
+	/**
+	 * Gets the current type of data name.
+	 * @return Type of data name.
+	 */
+	public String getDataName() {
+		return dataName;
+	}
 }

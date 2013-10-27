@@ -16,6 +16,7 @@
 package es.jafs.jaiberdroid;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -376,7 +377,7 @@ final class QueryManager extends SQLiteOpenHelper {
 
 					if (int.class.equals(type) || Integer.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getInt(pos));
-					} else if (long.class.equals(type) || Long.class.equals(type)) {
+					} else if (long.class.equals(type) || Long.class.equals(type) || Date.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getLong(pos));
 					} else if (String.class.equals(type)) {
 						JaiberdroidReflection.executeSetMethod(name, result, type, cursor.getString(pos));

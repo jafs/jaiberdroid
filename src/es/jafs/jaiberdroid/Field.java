@@ -15,6 +15,8 @@
  */
 package es.jafs.jaiberdroid;
 
+import es.jafs.jaiberdroid.utils.ToString;
+
 /**
  * Class that represents a field of a table.<br />
  * Stores the name, type, if is primary key and if is auto increment field. Provides
@@ -24,7 +26,7 @@ package es.jafs.jaiberdroid;
  * @version 0.5
  */
 @SuppressWarnings("rawtypes")
-final class Field {
+final class Field extends ToString {
 	/** Name of the field. */
 	private String name = "";
 	/** Field's data type. */
@@ -210,32 +212,5 @@ final class Field {
 	 */
 	final void setAscOrder(final boolean ascOrder) {
 		this.ascOrder = ascOrder;
-	}
-
-
-	/**
-	 * Gets a string with the object's content.
-	 * @return String with the object's content.
-	 */
-	@Override
-	public String toString() {
-		final StringBuilder objSql = new StringBuilder();
-
-		objSql.append(Field.class.getName());
-		objSql.append("{name->");
-		objSql.append(name);
-		objSql.append("; type->");
-		objSql.append(type.name());
-		objSql.append("; primary->");
-		objSql.append(primary);
-		objSql.append("; isnull->");
-		objSql.append(isnull);
-		objSql.append("; unique->");
-		objSql.append(unique);
-		objSql.append("; default->");
-		objSql.append(defaultValue);
-		objSql.append('}');
-
-		return objSql.toString();
 	}
 }

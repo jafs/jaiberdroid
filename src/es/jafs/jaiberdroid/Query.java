@@ -17,6 +17,7 @@ package es.jafs.jaiberdroid;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -210,6 +211,8 @@ public class Query {
 														+ query.getEntity().getTableName()
 														+ " can't be null");
 						}
+					} else if (FieldTypes.DATE.equals(field.getType())) {
+						values.put(field.getName(), Long.toString(Date.parse((String) data) / 1000));
 					} else {
 						values.put(field.getName(), data.toString());
 					}

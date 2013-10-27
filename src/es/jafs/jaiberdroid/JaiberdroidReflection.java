@@ -17,6 +17,7 @@ package es.jafs.jaiberdroid;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.Locale;
 
 import android.text.TextUtils;
@@ -98,7 +99,9 @@ public class JaiberdroidReflection {
 		try {
 			if (readOnly) { // Methods of type GET.
 				result = object.getClass().getMethod(name, new Class[0]).invoke(object, new Object[0]);
-			} else { // Methods of type SET.
+			} else if (Date.class.equals(type)) { // Methods of type SET. Date are loaded from int values
+				object.getClass().getMethod(name, type).invoke(object, new Date(((Long) value) * 1000));
+			} else {
 				object.getClass().getMethod(name, type).invoke(object, value);
 			}
 		} catch (final IllegalArgumentException e) {
@@ -225,6 +228,8 @@ public class JaiberdroidReflection {
 				type = FieldTypes.REAL;
 			} else if (boolean.class.getName().equals(typeName) || Boolean.class.getName().equals(typeName)) {
 				type = FieldTypes.BOOLEAN;
+			} else if (Date.class.getName().equals(typeName)) {
+				type = FieldTypes.DATE;
 			} else {
 				throw new JaiberdroidException("Invalid data type: " + attribute.getType().getName());
 			}
@@ -277,7 +282,8 @@ public class JaiberdroidReflection {
 		primitive = int.class.getName().equals(type.getName())
 					|| long.class.getName().equals(type.getName())
 					|| double.class.getName().equals(type.getName())
-					|| float.class.getName().equals(type.getName());
+					|| float.class.getName().equals(type.getName())
+					|| boolean.class.getName().equals(type.getName());
 		
 		return primitive;
 	}
